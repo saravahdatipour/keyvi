@@ -1,2 +1,2 @@
-codelens.authenticators.VerifyUsernameAuthenticatorFactory
-codelens.authenticators.DeviceLimitAuthenticator
+keyvi.authenticators.VerifyUsernameAuthenticatorFactory
+keyvi.authenticators.DeviceLimitAuthenticator
