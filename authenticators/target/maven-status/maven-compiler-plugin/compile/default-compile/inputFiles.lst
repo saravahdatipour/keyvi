@@ -1,0 +1,14 @@
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/events/SessionRestrictorEventListenerProvider.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/authenticators/DeviceLimitAuthenticator.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/requiredactions/VerifyPhoneNumber.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/authenticators/VerifyUsernameAuthenticatorFactory.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/dtos/Staff.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/dtos/Customer.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/events/SessionRestrictorEventListenerProviderFactory.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/utils/DeviceHelper.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/requiredactions/UpdateStaffNumberRequiredActionFactory.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/dtos/Device.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/requiredactions/UpdateStaffNumberRequiredAction.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/authenticators/VerifyUsernameAuthenticator.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/requiredactions/VerifyPhoneNumberRequiredActionFactory.java
+/home/sara/IdeaProjects/keycloak-customised/authenticators/src/main/java/codelens/utils/StaffNumberHelper.java
