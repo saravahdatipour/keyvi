@@ -91,22 +91,7 @@
                               },
                               body: JSON.stringify({
                                  "@context": "https://irma.app/ld/request/disclosure/v2",
-                                   "disclose": [
-                                     [
-                                       [ "irma-demo.MijnOverheid.root.BSN" ]
-                                     ],
-                                     [
-                                       [
-                                         "irma-demo.nijmegen.address.street",
-                                         "irma-demo.nijmegen.address.houseNumber",
-                                         "irma-demo.nijmegen.address.city"
-                                       ],
-                                       [
-                                         "irma-demo.idin.idin.address",
-                                         "irma-demo.idin.idin.city"
-                                       ]
-                                     ]
-                                   ]
+                                   "disclose": ${identifiersStringified?no_esc}
                               })
                             },
                           }

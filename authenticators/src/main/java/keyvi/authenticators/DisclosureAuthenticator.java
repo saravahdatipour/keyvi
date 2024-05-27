@@ -149,13 +149,71 @@ public class DisclosureAuthenticator implements Authenticator  {
         boolean enableYivi = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableYivi"));
         context.form().setAttribute("enableYivi", enableYivi);
 
-
         boolean enableCountry = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableCountry"));
-        if(enableCountry)
-        {
-            String countryIdentifier = Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier();
-            context.form().setAttribute("countryIdentifier", countryIdentifier);
+        boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
+        boolean enableEmailEmail = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableEmailEmail"));
+        boolean enableAddressCity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAddressCity"));
+        boolean enableStudentCardUniversity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableStudentCardUniversity"));
+
+        String identifiersStringified = prepareIdentifiersForFTL(enableCountry, enableAgeLowerOver18, enableEmailEmail, enableAddressCity, enableStudentCardUniversity);
+        context.form().setAttribute("identifiersStringified", identifiersStringified);
+    }
+
+    // Private function to prepare the identifiers for FTL
+    private String prepareIdentifiersForFTL(boolean enableCountry, boolean enableAgeLowerOver18, boolean enableEmailEmail, boolean enableAddressCity, boolean enableStudentCardUniversity) {
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("[");
+
+        boolean isFirstGroup = true;
+
+        // Conditionally add identifiers based on enabled flags
+        if (enableAgeLowerOver18) {
+            if (!isFirstGroup) jsonBuilder.append(",");
+            jsonBuilder.append("[[\"");
+            jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier());
+            jsonBuilder.append("\"]]");
+            isFirstGroup = false;
         }
+
+        if (enableCountry || enableAddressCity) {
+            if (!isFirstGroup) jsonBuilder.append(",");
+            jsonBuilder.append("[[");
+            if (enableCountry) {
+                jsonBuilder.append("\"");
+                jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier());
+                jsonBuilder.append("\"");
+                if (enableAddressCity) jsonBuilder.append(",");
+            }
+            if (enableAddressCity) {
+                jsonBuilder.append("\"");
+                jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier());
+                jsonBuilder.append("\"");
+            }
+            jsonBuilder.append("]]");
+            isFirstGroup = false;
+        }
+
+        if (enableEmailEmail || enableStudentCardUniversity) {
+            if (!isFirstGroup) jsonBuilder.append(",");
+            jsonBuilder.append("[[");
+            if (enableEmailEmail) {
+                jsonBuilder.append("\"");
+                jsonBuilder.append(Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier());
+                jsonBuilder.append("\"");
+                if (enableStudentCardUniversity) jsonBuilder.append(",");
+            }
+            if (enableStudentCardUniversity) {
+                jsonBuilder.append("\"");
+                jsonBuilder.append(Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier());
+                jsonBuilder.append("\"");
+            }
+            jsonBuilder.append("]]");
+        }
+
+        jsonBuilder.append("]");
+
+        // Convert the StringBuilder content to a string
+        return jsonBuilder.toString();
     }
 
 
