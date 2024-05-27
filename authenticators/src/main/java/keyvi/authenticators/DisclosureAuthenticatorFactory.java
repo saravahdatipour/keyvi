@@ -64,24 +64,40 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         enable_property.setHelpText("Enable or disable using Yivi.");
         configProperties.add(enable_property);
 
-        ProviderConfigProperty over_18= new ProviderConfigProperty();
-        over_18.setName("over18property");
-        over_18.setLabel("over18 property");
-        over_18.setType(ProviderConfigProperty.BOOLEAN_TYPE);
-        over_18.setDefaultValue("false");
-        over_18.setHelpText("Enable or disable using over 18 credential.");
-        configProperties.add(over_18);
+//        ProviderConfigProperty over_18= new ProviderConfigProperty();
+//        over_18.setName("over18property");
+//        over_18.setLabel("over18 property");
+//        over_18.setType(ProviderConfigProperty.BOOLEAN_TYPE);
+//        over_18.setDefaultValue("false");
+//        over_18.setHelpText("Enable or disable using over 18 credential.");
+//        configProperties.add(over_18);
 
-        ProviderConfigProperty yivi_email= new ProviderConfigProperty();
-        yivi_email.setName("yiviemail");
-        yivi_email.setLabel("yivi email property");
-        yivi_email.setType(ProviderConfigProperty.BOOLEAN_TYPE);
-        yivi_email.setHelpText("Enable or disable using email credential");
-        configProperties.add(yivi_email);
+//        ProviderConfigProperty yivi_email= new ProviderConfigProperty();
+//        yivi_email.setName("yiviemail");
+//        yivi_email.setLabel("yivi email property");
+//        yivi_email.setType(ProviderConfigProperty.BOOLEAN_TYPE);
+//        yivi_email.setHelpText("Enable or disable using email credential");
+//        configProperties.add(yivi_email);
 
         ProviderConfigProperty country = new ProviderConfigProperty();
         this.initiatizeConfigProperty("enableCountry", "yivi country property", "It enables or disables using country in request", country);
         configProperties.add(country);
+
+        ProviderConfigProperty age = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableAgeLowerOver18", "yivi age over 18 property", "It enables or disables using over 18 age in request", age);
+        configProperties.add(age);
+
+        ProviderConfigProperty city = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableAddressCity", "yivi city property", "It enables or disables using city in request", city);
+        configProperties.add(city);
+
+        ProviderConfigProperty email = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableEmailEmail", "yivi email property", "It enables or disables using email in request", email);
+        configProperties.add(email);
+
+        ProviderConfigProperty studentCardUniversity = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property", "It enables or disables using university in request", studentCardUniversity);
+        configProperties.add(studentCardUniversity);
 
         return configProperties;
     }

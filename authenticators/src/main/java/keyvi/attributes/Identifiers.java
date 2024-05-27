@@ -19,7 +19,7 @@ public class Identifiers {
     }
 
     public enum Pbdf {
-        EMAIL_EMAIL("pbdf.pbdf.email.email");
+        EMAIL_EMAIL("pbdf.sidn-pbdf.email.email");
 
         private final String identifier;
 
