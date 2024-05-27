@@ -71,51 +71,64 @@
                                          ${countryIdentifier}
                                      </#if>
 
-                    <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                      const startPopupButton = document.getElementById('start-popup');
-                      if (startPopupButton) {
-                        let options = {
-                          debugging: true,
-                          language: 'en',
-                          translations: {
-                            header: 'Try this <i class="yivi-web-logo">Yivi</i> example',
-                            loading: 'Just one second please!'
-                          },
-                          session: {
-                            url: 'http://159.65.93.73:8088',
-                            start: {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json'
-                              },
-                              body: JSON.stringify({
-                                 "@context": "https://irma.app/ld/request/disclosure/v2",
-                                   "disclose": ${identifiersStringified?no_esc}
-                              })
-                            },
-                          }
-                        };
+                 <script>
+                 document.addEventListener('DOMContentLoaded', function() {
+                   const startPopupButton = document.getElementById('start-popup');
+                   if (startPopupButton) {
+                     let options = {
+                       debugging: true,
+                       language: 'en',
+                       translations: {
+                         header: 'Try this <i class="yivi-web-logo">Yivi</i> example',
+                         loading: 'Just one second please!'
+                       },
+                       session: {
+                         url: 'http://159.65.93.73:8088',
+                         start: {
+                           method: 'POST',
+                           headers: {
+                             'Content-Type': 'application/json'
+                           },
+                           body: JSON.stringify({
+                             "@context": "https://irma.app/ld/request/disclosure/v2",
+                             "disclose": ${identifiersStringified?no_esc}
+                           })
+                         },
+                       }
+                     };
 
-                        let yiviPopup = window.yivi.newPopup(options);
+                     let yiviPopup = window.yivi.newPopup(options);
 
-                        startPopupButton.onclick = () => {
-                          yiviPopup.start()
-                            .then(result => {
-                           alert(JSON.stringify(result));
-                            })
-                            .catch(error => {
-                              if (error === 'Aborted') {
-                                console.log('We closed it ourselves, so no problem 😅');
-                                return;
-                              }
-                              console.error("Couldn't do what you asked 😢", error);
-                            })
-                            .finally(() => yiviPopup = window.yivi.newPopup(options));
-                        };
-                      }
-                    });
-                    </script>
+                     startPopupButton.onclick = () => {
+                       yiviPopup.start()
+                         .then(result => {
+                           // Create a hidden form and submit the Yivi response
+                           const form = document.createElement('form');
+                           form.method = 'POST';
+                           form.action = ''; // The current URL
+
+                           const yiviResponseInput = document.createElement('input');
+                           yiviResponseInput.type = 'hidden';
+                           yiviResponseInput.name = 'yiviResponse';
+                           yiviResponseInput.value = JSON.stringify(result);
+
+                           form.appendChild(yiviResponseInput);
+                           document.body.appendChild(form);
+
+                           form.submit();
+                         })
+                         .catch(error => {
+                           if (error === 'Aborted') {
+                             console.log('We closed it ourselves, so no problem 😅');
+                             return;
+                           }
+                           console.error("Couldn't do what you asked 😢", error);
+                         })
+                         .finally(() => yiviPopup = window.yivi.newPopup(options));
+                     };
+                   }
+                 });
+                 </script>
 
 
                                     </div>

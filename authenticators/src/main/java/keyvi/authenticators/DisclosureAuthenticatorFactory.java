@@ -41,9 +41,6 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
     public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
         return REQUIREMENT_CHOICES;
     }
-
-
-
     @Override
     public boolean isUserSetupAllowed() {
         return false;
