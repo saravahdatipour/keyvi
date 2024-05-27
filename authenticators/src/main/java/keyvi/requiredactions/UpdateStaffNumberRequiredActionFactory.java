@@ -1,4 +1,4 @@
-package codelens.requiredactions;
+package keyvi.requiredactions;
 
 import org.jboss.logging.Logger;
 import org.keycloak.Config;

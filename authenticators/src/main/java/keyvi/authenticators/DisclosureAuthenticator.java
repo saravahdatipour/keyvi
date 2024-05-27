@@ -2,20 +2,11 @@ package keyvi.authenticators;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
-import org.keycloak.Config;
+import keyvi.attributes.Identifiers;
 import org.keycloak.authentication.*;
-import org.keycloak.authentication.authenticators.directgrant.ValidatePassword;
 import org.keycloak.credential.CredentialInput;
-import org.keycloak.credential.CredentialProvider;
-import org.keycloak.credential.PasswordCredentialProvider;
-import org.keycloak.credential.UserCredentialStore;
 import org.keycloak.events.Errors;
-import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.jose.jwk.JWK;
 import org.keycloak.models.*;
-import org.keycloak.models.credential.PasswordCredentialModel;
-import org.keycloak.models.credential.PasswordUserCredentialModel;
-import org.keycloak.provider.ProviderConfigProperty;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
@@ -25,16 +16,10 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 public class DisclosureAuthenticator implements Authenticator  {
     private static final Logger LOG = Logger.getLogger(DisclosureAuthenticator.class);
-    public static final String USERNAME_PASSWORD_LOGIN_FORM = "username-password-login.ftl";
+    public static final String USERNAME_PASSWORD_LOGIN_FORM = "backup.ftl";
     public static boolean YIVI_TOGGLE = true;
 
 
@@ -55,20 +40,26 @@ public class DisclosureAuthenticator implements Authenticator  {
 //        LOG.warnf("configuration working");
 //
 //
-//        Response challengeusernamepassword = context.form().createForm(USERNAME_PASSWORD_LOGIN_FORM);
+//        Response challengeusernamepassword = context.form().createLoginUsernamePassword()
 //        context.challenge(challengeusernamepassword);
 //
 //    }
     public void authenticate(AuthenticationFlowContext context) {
         LOG.debugf("authenticate");
-        final LoginFormsProvider formsProvider = context.form();
-        formsProvider.setAttribute("formModel", new DisclosureFormModel());
-        // Example boolean variable
-        boolean enableSecondOption = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableSecondOption"));
+//        final LoginFormsProvider formsProvider = context.form();
+//        formsProvider.setAttribute("formModel", new DisclosureFormModel());
+//        // Example boolean variable
+//        boolean enableSecondOption = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableSecondOption"));
+//
+//        formsProvider.setAttribute("enableSecondOption", enableSecondOption);
+//        context.challenge(formsProvider.createLoginUsernamePassword());
 
-        boolean isUserVerified = true;
-        formsProvider.setAttribute("enableSecondOption", enableSecondOption);
-        context.challenge(formsProvider.createForm("backup.ftl"));
+        // Pass the configuration value to the form
+        this.setRequiredAttributes(context);
+
+        // Proceed with challenge
+        context.challenge(context.form().createLoginUsernamePassword());
+
     }
 
 
@@ -114,8 +105,9 @@ public class DisclosureAuthenticator implements Authenticator  {
         if (Validation.isBlank(username) || Validation.isBlank((password))) {
             //Form is empty somewhere
             context.getEvent().error("Username is missing");
+            this.setRequiredAttributes(context);
             Response challenge = context.form()
-                    .createForm(USERNAME_PASSWORD_LOGIN_FORM);
+                    .createLoginUsernamePassword();
 
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
@@ -126,9 +118,10 @@ public class DisclosureAuthenticator implements Authenticator  {
         if (user == null) {
             // no user matched
             context.getEvent().error(Errors.USER_NOT_FOUND);
+            this.setRequiredAttributes(context);
             Response challenge = context.form()
                     .setError(Messages.INVALID_USER)
-                    .createForm(USERNAME_PASSWORD_LOGIN_FORM);
+                    .createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
             return;
         }
@@ -142,14 +135,28 @@ public class DisclosureAuthenticator implements Authenticator  {
         } else {
             // Password is invalid
             context.getEvent().user(user).error(Errors.INVALID_USER_CREDENTIALS);
+            this.setRequiredAttributes(context);
             Response challenge = context.form()
                     .setError(Messages.INVALID_PASSWORD)
-                    .createForm(USERNAME_PASSWORD_LOGIN_FORM);
+                    .createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
         }
 
     }
 
+    private void setRequiredAttributes(AuthenticationFlowContext context)
+    {
+        boolean enableYivi = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableYivi"));
+        context.form().setAttribute("enableYivi", enableYivi);
+
+
+        boolean enableCountry = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableCountry"));
+        if(enableCountry)
+        {
+            String countryIdentifier = Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier();
+            context.form().setAttribute("countryIdentifier", countryIdentifier);
+        }
+    }
 
 
     @Override

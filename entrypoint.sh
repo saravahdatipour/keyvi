@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start Keycloak server in the background
-/opt/keycloak/bin/kc.sh start-dev --hostname-strict=false --http-relative-path=/auth &
+/opt/keycloak/bin/kc.sh start-dev --hostname-strict=false &
 
 # Wait for Keycloak to be ready
 echo "Waiting for Keycloak to start..."

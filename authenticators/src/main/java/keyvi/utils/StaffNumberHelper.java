@@ -1,6 +1,6 @@
-package codelens.utils;
+package keyvi.utils;
 
-import codelens.dtos.Staff;
+import keyvi.dtos.Staff;
 
 import java.util.ArrayList;
 import java.util.List;

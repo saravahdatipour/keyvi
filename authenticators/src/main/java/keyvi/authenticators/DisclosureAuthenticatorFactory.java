@@ -57,8 +57,8 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
     public List<ProviderConfigProperty> getConfigProperties() {
         List<ProviderConfigProperty> configProperties = new ArrayList<>();
         ProviderConfigProperty enable_property= new ProviderConfigProperty();
-        enable_property.setName("enableSecondOption");
-        enable_property.setLabel("Enable Second Option");
+        enable_property.setName("enableYivi");
+        enable_property.setLabel("enable Yivi");
         enable_property.setType(ProviderConfigProperty.BOOLEAN_TYPE);
         enable_property.setDefaultValue("false");
         enable_property.setHelpText("Enable or disable using Yivi.");
@@ -79,12 +79,20 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         yivi_email.setHelpText("Enable or disable using email credential");
         configProperties.add(yivi_email);
 
-
-
+        ProviderConfigProperty country = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableCountry", "yivi country property", "It enables or disables using country in request", country);
+        configProperties.add(country);
 
         return configProperties;
     }
 
+    private void initiatizeConfigProperty(String name, String label, String helpText, ProviderConfigProperty configProperty)
+    {
+        configProperty.setName(name);
+        configProperty.setLabel(label);
+        configProperty.setType(ProviderConfigProperty.BOOLEAN_TYPE);
+        configProperty.setHelpText(helpText);
+    }
     @Override
     public Authenticator create(KeycloakSession keycloakSession) {
         return new DisclosureAuthenticator();

@@ -1,15 +1,15 @@
-package codelens.requiredactions;
+package keyvi.requiredactions;
 
-import codelens.dtos.Staff;
-import codelens.utils.StaffNumberHelper;
+import keyvi.dtos.Staff;
+import keyvi.utils.StaffNumberHelper;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 
 public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
 

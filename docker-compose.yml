@@ -11,7 +11,7 @@ services:
       MYSQL_PASSWORD: password
 
   keycloak-authenticator:
-    container_name: custom-keycloak-v2
+    container_name: keyvi
     build: .
     environment:
       DB_VENDOR: MYSQL
@@ -19,15 +19,21 @@ services:
       DB_DATABASE: keycloak
       DB_USER: keycloak
       DB_PASSWORD: password
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: Pa55w0rd
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
       JDBC_PARAMS: "useSSL=false"
+      KEYCLOAK_HOSTNAME: localhost
     expose:
       - '8080'
     ports:
-      - '9990:8080'
+      - '9995:8080'
     depends_on:
       - mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mysql_data_volume:

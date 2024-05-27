@@ -1,7 +1,7 @@
-package codelens.utils;
+package keyvi.utils;
 
-import codelens.dtos.Customer;
-import codelens.dtos.Device;
+import keyvi.dtos.Customer;
+import keyvi.dtos.Device;
 
 import java.util.ArrayList;
 import java.util.List;

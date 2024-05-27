@@ -1,4 +1,4 @@
-package codelens.dtos;
+package keyvi.dtos;
 
 import java.util.List;
 

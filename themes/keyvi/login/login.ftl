@@ -1,5 +1,6 @@
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayInfo=false displayMessage=false; section>
+<#assign enableOption = (enableOption!false)>
     <#if section = "title">
         ${msg("loginTitle",(realm.displayName!''))}
     <#elseif section = "form">
@@ -59,7 +60,17 @@
                                             </#list>
                                         </#if>
                                          <!-- Yivi Web Form Integration -->
-                                        <button id="start-popup" type="button">Login With Yivi</button>
+                                     <#if enableYivi>
+                                         <button id="start-popup" type="button">Login With Yivi</button>
+
+                                     <#else>
+                                         <p>Yivi is not enabled!</p>
+                                     </#if>
+
+                                     <#if countryIdentifier?has_content>
+                                         ${countryIdentifier}
+                                     </#if>
+
                     <script>
                     document.addEventListener('DOMContentLoaded', function() {
                       const startPopupButton = document.getElementById('start-popup');

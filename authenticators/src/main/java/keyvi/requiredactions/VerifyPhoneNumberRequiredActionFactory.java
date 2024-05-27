@@ -1,4 +1,4 @@
-package codelens.requiredactions;
+package keyvi.requiredactions;
 
 import org.keycloak.Config;
 import org.keycloak.authentication.RequiredActionFactory;
