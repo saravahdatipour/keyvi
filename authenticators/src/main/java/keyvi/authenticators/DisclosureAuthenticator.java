@@ -3,19 +3,20 @@ package keyvi.authenticators;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import keyvi.attributes.Identifiers;
-import org.keycloak.authentication.*;
+import org.jboss.logging.Logger;
+import org.keycloak.authentication.AuthenticationFlowContext;
+import org.keycloak.authentication.AuthenticationFlowError;
+import org.keycloak.authentication.Authenticator;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.events.Errors;
 import org.keycloak.models.*;
-import org.jboss.logging.Logger;
-import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.authentication.Authenticator;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
-
+import java.util.Map;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class DisclosureAuthenticator implements Authenticator  {
     private static final Logger LOG = Logger.getLogger(DisclosureAuthenticator.class);
@@ -25,35 +26,8 @@ public class DisclosureAuthenticator implements Authenticator  {
 
     // TODO: write authenticate logic
     @Override
-//    public void authenticate(AuthenticationFlowContext context) {
-//        // 1. This method is called first.
-//        // It checks if the current request meets the requirements of the authenticator.
-//        // If not, it may prompt the user for additional information or actions.
-//        LOG.warnf("authenticate");
-//        boolean enableSecondOption = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableSecondOption"));
-//        boolean over18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("over18property"));
-//        boolean yiviEmailEnabled = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("yiviemail"));
-//        context.getAuthenticationSession().setAuthNote("yiviEmailEnabled", String.valueOf(yiviEmailEnabled));
-//
-//
-//        LOG.warnf(String.valueOf(yiviEmailEnabled));
-//        LOG.warnf("configuration working");
-//
-//
-//        Response challengeusernamepassword = context.form().createLoginUsernamePassword()
-//        context.challenge(challengeusernamepassword);
-//
-//    }
     public void authenticate(AuthenticationFlowContext context) {
         LOG.debugf("authenticate");
-//        final LoginFormsProvider formsProvider = context.form();
-//        formsProvider.setAttribute("formModel", new DisclosureFormModel());
-//        // Example boolean variable
-//        boolean enableSecondOption = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableSecondOption"));
-//
-//        formsProvider.setAttribute("enableSecondOption", enableSecondOption);
-//        context.challenge(formsProvider.createLoginUsernamePassword());
-
         // Pass the configuration value to the form
         this.setRequiredAttributes(context);
 
@@ -97,34 +71,40 @@ public class DisclosureAuthenticator implements Authenticator  {
     public void action(AuthenticationFlowContext context) {
         LOG.warnf("action");
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+        String loginMethod = formData.getFirst("login_method");
+
+        if ("yivi".equals(loginMethod)) {
+            handleYiviLogin(context, formData);
+        } else {
+            handleStandardLogin(context, formData);
+        }
+    }
+
+    private void handleStandardLogin(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
         String username = formData.getFirst("username");
         String password = formData.getFirst("password");
 
-        //Validate form
-
-        if (Validation.isBlank(username) || Validation.isBlank((password))) {
-            //Form is empty somewhere
+        // Validate form
+        if (Validation.isBlank(username) || Validation.isBlank(password)) {
+            // Form is empty somewhere
             context.getEvent().error("Username is missing");
             this.setRequiredAttributes(context);
-            Response challenge = context.form()
-                    .createLoginUsernamePassword();
-
+            Response challenge = context.form().createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
         }
 
-        //find user
+        // Find user
         UserModel user = context.getSession().users().getUserByUsername(context.getRealm(), username);
         if (user == null) {
-            // no user matched
+            // No user matched
             context.getEvent().error(Errors.USER_NOT_FOUND);
             this.setRequiredAttributes(context);
-            Response challenge = context.form()
-                    .setError(Messages.INVALID_USER)
-                    .createLoginUsernamePassword();
+            Response challenge = context.form().setError(Messages.INVALID_USER).createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
             return;
         }
+
         CredentialInput input = UserCredentialModel.password(password);
         boolean isValid = user.credentialManager().isValid(input);
 
@@ -136,12 +116,102 @@ public class DisclosureAuthenticator implements Authenticator  {
             // Password is invalid
             context.getEvent().user(user).error(Errors.INVALID_USER_CREDENTIALS);
             this.setRequiredAttributes(context);
-            Response challenge = context.form()
-                    .setError(Messages.INVALID_PASSWORD)
-                    .createLoginUsernamePassword();
+            Response challenge = context.form().setError(Messages.INVALID_PASSWORD).createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
         }
+    }
 
+    private void handleYiviLogin(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
+        String claims = formData.getFirst("claims");
+
+        // Process the claims data
+        if (claims != null && !claims.isEmpty()) {
+            LOG.warnf("Claims are not empty!");
+            LOG.warnf("Claims Data: %s", claims);
+
+            // Initialize the Yivi account and set the user in the context
+            UserModel user = this.initializeYiviAccount(context, claims);
+            if (user != null) {
+                context.setUser(user);
+                context.success();
+            } else {
+                context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, context.form().createForm("yiviLoginError.ftl"));
+            }
+
+        } else {
+            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, context.form().createForm("yiviLoginError.ftl"));
+        }
+    }
+
+    private UserModel initializeYiviAccount(AuthenticationFlowContext context, String claims)
+    {
+        KeycloakSession session = context.getSession();
+        RealmModel realm = context.getRealm();
+        UserProvider userProvider = session.users();
+
+        // Parse claims JSON string using Gson
+        Gson gson = new Gson();
+        JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
+
+        String email = null;
+        String firstName = "Yivi";
+        String lastName = "User";
+        String country = null;
+        String city = null;
+        String university = null;
+        String ageOver18 = "no";
+
+        JsonArray disclosedArray = claimsData.getAsJsonArray("disclosed");
+        for (JsonElement arrayElement : disclosedArray) {
+            JsonArray array = arrayElement.getAsJsonArray();
+            for (JsonElement objElement : array) {
+                JsonObject obj = objElement.getAsJsonObject();
+                String id = obj.get("id").getAsString();
+                String rawValue = obj.get("rawvalue").getAsString();
+                if (Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier().equals(id)) {
+                    ageOver18 = rawValue;
+                } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier().equals(id)) {
+                    country = rawValue;
+                } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier().equals(id)) {
+                    city = rawValue;
+                } else if (Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier().equals(id)) {
+                    email = rawValue;
+                } else if (Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier().equals(id)) {
+                    university = rawValue;
+                }
+            }
+        }
+
+        if (email == null) {
+            LOG.warn("Email is missing in the claims data.");
+            return null;
+        }
+
+        // Check if the user already exists
+        UserModel existingUser = userProvider.getUserByEmail(realm, email);
+        if (existingUser != null) {
+            LOG.info("User with email already exists");
+            return existingUser;
+        }
+
+        // Create a new user
+        UserModel user = userProvider.addUser(realm, email);
+        user.setEnabled(true);
+        user.setEmail(email);
+        user.setUsername(email);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+
+        // Set user attributes
+        user.setSingleAttribute("ageOver18", ageOver18);
+        user.setSingleAttribute("country", country);
+        user.setSingleAttribute("city", city);
+        user.setSingleAttribute("university", university);
+
+        // Set a temporary password for the user
+        user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
+
+        return user;
     }
 
     private void setRequiredAttributes(AuthenticationFlowContext context)

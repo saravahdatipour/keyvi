@@ -23,6 +23,8 @@
                             </#if>
 
                             <form id="kc-form-login" class="${properties.kcFormClass!}" onsubmit="login.disabled = true; return true;" action="${url.loginAction?keep_after('^[^#]*?://.*?[^/]*', 'r')}" method="post">
+                                <input type="hidden" name="login_method" id="login-method" value="standard">
+                                <input type="hidden" name="claims" id="claims">
                                 <div class="${properties.kcInputWrapperClass!}">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                                     <#if usernameEditDisabled??>
@@ -53,7 +55,10 @@
 
                                 <div id="kc-form-buttons" style="margin-top:10px" class="${properties.kcFormButtonsClass!}">
                                     <div class="${properties.kcFormButtonsWrapperClass!}">
-                                        <input tabindex="4" class="${properties.kcButtonClass!}" name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
+                                        <#--  <input tabindex="4" class="${properties.kcButtonClass!}" name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>  -->
+                                        <button type="submit" class="${properties.kcButtonClass!}" id="standard-login" onclick="document.getElementById('login-method').value='standard'">${msg("doLogIn")}</button>
+
+
                                         <#if realm.password && social.providers??>
                                             <#list social.providers as p>
                                                 <a href="${p.loginUrl}" id="zocial-${p.alias}" class="btn btn-primary">${msg("doLogIn")} With ${p.displayName}</a>
@@ -62,6 +67,8 @@
                                          <!-- Yivi Web Form Integration -->
                                      <#if enableYivi>
                                          <button id="start-popup" type="button">Login With Yivi</button>
+                                         <button type="button" class="${properties.kcButtonClass!}" id="start-popup">Login With Yivi</button>
+
 
                                      <#else>
                                          <p>Yivi is not enabled!</p>
@@ -71,51 +78,57 @@
                                          ${countryIdentifier}
                                      </#if>
 
-                    <script>
+                            <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                      const startPopupButton = document.getElementById('start-popup');
-                      if (startPopupButton) {
-                        let options = {
-                          debugging: true,
-                          language: 'en',
-                          translations: {
-                            header: 'Try this <i class="yivi-web-logo">Yivi</i> example',
-                            loading: 'Just one second please!'
-                          },
-                          session: {
-                            url: 'http://159.65.93.73:8088',
-                            start: {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json'
-                              },
-                              body: JSON.stringify({
-                                 "@context": "https://irma.app/ld/request/disclosure/v2",
-                                   "disclose": ${identifiersStringified?no_esc}
-                              })
-                            },
-                          }
-                        };
+                        const startPopupButton = document.getElementById('start-popup');
+                        const claimsInput = document.getElementById('claims');
+                        const loginMethodInput = document.getElementById('login-method');
 
-                        let yiviPopup = window.yivi.newPopup(options);
+                        if (startPopupButton) {
+                            let options = {
+                                debugging: true,
+                                language: 'en',
+                                translations: {
+                                    header: 'Try this <i class="yivi-web-logo">Yivi</i> example',
+                                    loading: 'Just one second please!'
+                                },
+                                session: {
+                                    url: 'http://159.65.93.73:8088',
+                                    start: {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            "@context": "https://irma.app/ld/request/disclosure/v2",
+                                            "disclose": ${identifiersStringified?no_esc}
+                                        })
+                                    },
+                                }
+                            };
 
-                        startPopupButton.onclick = () => {
-                          yiviPopup.start()
-                            .then(result => {
-                           alert(JSON.stringify(result));
-                            })
-                            .catch(error => {
-                              if (error === 'Aborted') {
-                                console.log('We closed it ourselves, so no problem 😅');
-                                return;
-                              }
-                              console.error("Couldn't do what you asked 😢", error);
-                            })
-                            .finally(() => yiviPopup = window.yivi.newPopup(options));
-                        };
-                      }
+                            let yiviPopup = window.yivi.newPopup(options);
+
+                            startPopupButton.onclick = () => {
+                                loginMethodInput.value = 'yivi';
+                                yiviPopup.start()
+                                    .then(result => {
+                                        claimsInput.value = JSON.stringify(result);
+                                        document.getElementById('kc-form-login').submit();
+                                    })
+                                    .catch(error => {
+                                        if (error === 'Aborted') {
+                                            console.log('We closed it ourselves, so no problem 😅');
+                                            return;
+                                        }
+                                        console.error("Couldn't do what you asked 😢", error);
+                                    })
+                                    .finally(() => yiviPopup = window.yivi.newPopup(options));
+                            };
+                        }
                     });
-                    </script>
+</script>
+
 
 
                                     </div>
