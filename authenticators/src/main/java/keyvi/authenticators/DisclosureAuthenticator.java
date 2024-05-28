@@ -60,6 +60,34 @@ public class DisclosureAuthenticator implements Authenticator  {
         // Proceed with challenge
         context.challenge(context.form().createLoginUsernamePassword());
 
+        this.createSampleAccount(context);
+    }
+
+    private void createSampleAccount(AuthenticationFlowContext context) {
+        KeycloakSession session = context.getSession();
+        RealmModel realm = context.getRealm();
+        UserProvider userProvider = session.users();
+
+        // Check if the user already exists
+        UserModel existingUser = userProvider.getUserByEmail(realm, "test@gmail.com");
+        if (existingUser != null) {
+            LOG.info("Sample user already exists");
+            return;
+        }
+
+        // Create a new user
+        UserModel user = userProvider.addUser(realm, "test-user");
+        user.setEnabled(true);
+        user.setEmail("test@gmail.com");
+        user.setFirstName("Jason");
+        user.setLastName("Bro");
+
+        // Set user attributes
+        user.setSingleAttribute("name", "Jason");
+        user.setSingleAttribute("age", "19");
+
+        // Set a temporary password for the user
+        user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
     }
 
 
@@ -101,7 +129,6 @@ public class DisclosureAuthenticator implements Authenticator  {
         String password = formData.getFirst("password");
 
         //Validate form
-
         if (Validation.isBlank(username) || Validation.isBlank((password))) {
             //Form is empty somewhere
             context.getEvent().error("Username is missing");
