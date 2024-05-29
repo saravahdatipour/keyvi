@@ -93,7 +93,7 @@
                                     loading: 'Just one second please!'
                                 },
                                 session: {
-                                    url: 'https://159.65.93.73:8088',
+                                    url: 'https://catchthebugs.com',
                                     start: {
                                         method: 'POST',
                                         headers: {
