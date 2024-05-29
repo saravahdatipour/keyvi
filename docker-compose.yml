@@ -34,6 +34,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - /etc/letsencrypt/live/yivisso.com:/etc/x509/https
 
 volumes:
   mysql_data_volume:
