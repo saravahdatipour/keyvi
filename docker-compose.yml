@@ -21,12 +21,12 @@ services:
       DB_PASSWORD: password
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      JDBC_PARAMS: "useSSL=false"
+      JDBC_PARAMS: "useSSL=true"
       KEYCLOAK_HOSTNAME: localhost
     expose:
-      - '8080'
+      - '8443'
     ports:
-      - '9995:8080'
+      - '9995:8443'
     depends_on:
       - mysql
     healthcheck:

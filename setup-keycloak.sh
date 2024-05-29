@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+echo "Running setup-keycloak.sh..."
+
+# Ensure the script exits if any command fails
+set -e
+
 ##########
 #
 # This script sets up Keycloak using the Keycloak Config CLI and Keycloak Admin CLI.
@@ -23,7 +28,7 @@ runKeycloakConfigCli() {
 
   # run keycloak-config-cli
   java -jar "${BASEDIR}"/keycloak-config-cli.jar \
-      --keycloak.url=http://localhost:8080 \
+      --keycloak.url=https://localhost:8443 \
       --keycloak.ssl-verify=false \
       --keycloak.user="${KEYCLOAK_ADMIN}" \
       --keycloak.password="${KEYCLOAK_ADMIN_PASSWORD}" \
@@ -43,7 +48,7 @@ runKeycloakCli() {
   fi
 
   # login to admin console
-  ${KCADM} config credentials --server http://localhost:8080 --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
+  ${KCADM} config credentials --server https://localhost:8443 --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
 
   # project specific configurations
   # source "${BASEDIR}"/keycloak-cli-helpers.sh

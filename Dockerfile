@@ -16,11 +16,14 @@ RUN mkdir -p ${CODELENS_THEME_BASE_DIR} \
 
 COPY ${CODELENS_THEME_LOCAL_ROOT_DIR} ${CODELENS_THEME_BASE_DIR}
 
-# Copy the Keycloak Config CLI JAR, JSON configuration, setup script, and entrypoint script
+# Copy the Keycloak Config CLI JAR, JSON configuration, setup script, entrypoint script, and SSL certificates
 COPY keycloak-config-cli.jar /opt/keycloak/
 COPY realm-config.json /opt/keycloak/
 COPY setup-keycloak.sh /opt/keycloak/
 COPY entrypoint.sh /opt/keycloak/
+COPY certfile.pem /etc/x509/https/tls.crt
+COPY keyfile.pem /etc/x509/https/tls.key
+
 RUN chmod +x /opt/keycloak/setup-keycloak.sh /opt/keycloak/entrypoint.sh
 
 ENTRYPOINT ["/opt/keycloak/entrypoint.sh"]
