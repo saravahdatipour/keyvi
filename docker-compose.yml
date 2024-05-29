@@ -22,7 +22,7 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       JDBC_PARAMS: "useSSL=true"
-      KEYCLOAK_HOSTNAME: localhost
+      KEYCLOAK_HOSTNAME: yivisso.com
     expose:
       - '8443'
     ports:
