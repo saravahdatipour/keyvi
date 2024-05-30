@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start Keycloak server in the background with SSL configuration
-/opt/keycloak/bin/kc.sh start --hostname=yivisso.com --https-certificate-file=/etc/letsencrypt/live/yivisso.com/fullchain.pem --https-certificate-key-file=/etc/letsencrypt/live/yivisso.com/privkey.pem &
+/opt/keycloak/bin/kc.sh start --hostname=${KEYCLOAK_HOSTNAME} --https-certificate-file=/opt/keycloak/certs/fullchain.pem --https-certificate-key-file=/opt/keycloak/certs/privkey.pem &
 
 # Wait for Keycloak to be ready
 echo "Waiting for Keycloak to start..."

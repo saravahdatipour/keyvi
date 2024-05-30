@@ -11,6 +11,7 @@ set -e
 #
 #########
 
+# Trap any errors to exit the script
 trap 'exit' ERR
 
 echo " "
@@ -19,6 +20,7 @@ echo "--------------- KEYCLOAK SETUP STARTING ----------------"
 echo " "
 echo " "
 
+# Set BASEDIR to the directory where this script is located
 BASEDIR=$(dirname "$0")
 
 runKeycloakConfigCli() {
@@ -26,9 +28,9 @@ runKeycloakConfigCli() {
   echo "--- Running Keycloak Config CLI"
   echo ""
 
-  # run keycloak-config-cli
-  java -jar "${BASEDIR}"/keycloak-config-cli.jar \
-      --keycloak.url=https://yivisso.com \
+  # Run keycloak-config-cli with appropriate parameters
+  java -jar "${BASEDIR}/keycloak-config-cli.jar" \
+      --keycloak.url=https://${KEYCLOAK_HOSTNAME} \
       --keycloak.ssl-verify=false \
       --keycloak.user="${KEYCLOAK_ADMIN}" \
       --keycloak.password="${KEYCLOAK_ADMIN_PASSWORD}" \
@@ -38,7 +40,7 @@ runKeycloakConfigCli() {
       --import.managed.client=no-delete \
       --import.managed.client-scope=no-delete \
       --import.managed.client-scope-mapping=no-delete \
-      --import.files.locations="${BASEDIR}"/realm-config.json
+      --import.files.locations="${BASEDIR}/realm-config.json"
 }
 
 runKeycloakCli() {
@@ -47,12 +49,13 @@ runKeycloakCli() {
       echo "Using $KCADM as the admin CLI."
   fi
 
-  # login to admin console
-  ${KCADM} config credentials --server https://yivisso.com --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
+  # Log in to the admin console
+  ${KCADM} config credentials --server https://${KEYCLOAK_HOSTNAME} --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
 
-  # project specific configurations
-  # source "${BASEDIR}"/keycloak-cli-helpers.sh
-  # source "${BASEDIR}"/keycloak-cli-custom.sh
+  # Project specific configurations
+  # Uncomment and update the following lines as needed for your setup
+  # source "${BASEDIR}/keycloak-cli-helpers.sh"
+  # source "${BASEDIR}/keycloak-cli-custom.sh"
 }
 
 echo " "

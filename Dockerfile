@@ -7,7 +7,7 @@ USER root
 # Copy the authenticator JAR
 COPY ${AUTHENTICATOR_JAR} /opt/keycloak/providers/
 
-# Theme customization region
+# Theme customization
 ARG CODELENS_THEME_BASE_DIR=/opt/keycloak/themes/keyvi
 ARG CODELENS_THEME_LOCAL_ROOT_DIR=themes/keyvi
 
@@ -21,7 +21,9 @@ COPY keycloak-config-cli.jar /opt/keycloak/
 COPY realm-config.json /opt/keycloak/
 COPY setup-keycloak.sh /opt/keycloak/
 COPY entrypoint.sh /opt/keycloak/
-# DO NOT COPY SSL CERTIFICATES HERE, LET THEM BE MOUNTED
+
+# Copy Let's Encrypt certificates into the Docker image
+COPY /root/keyvi/yivisso.com /opt/keycloak/certs
 
 RUN chmod +x /opt/keycloak/setup-keycloak.sh /opt/keycloak/entrypoint.sh
 
