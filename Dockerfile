@@ -25,8 +25,16 @@ COPY entrypoint.sh /opt/keycloak/
 # Copy Let's Encrypt certificates into the Docker image
 COPY yivisso.com /opt/keycloak/certs
 
+# Ensure proper permissions
 RUN chmod 644 /opt/keycloak/certs/*
 
 RUN chmod +x /opt/keycloak/setup-keycloak.sh /opt/keycloak/entrypoint.sh
+
+# Set environment variables for Keycloak configuration
+ENV KC_HTTPS_CERTIFICATE_FILE="/opt/keycloak/certs/fullchain.pem"
+ENV KC_HTTPS_CERTIFICATE_KEY_FILE="/opt/keycloak/certs/privkey.pem"
+ENV KC_HOSTNAME="yivisso.com"
+ENV KC_HOSTNAME_STRICT="false"
+ENV KC_HOSTNAME_STRICT_HTTPS="false"
 
 ENTRYPOINT ["/opt/keycloak/entrypoint.sh"]

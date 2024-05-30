@@ -22,7 +22,11 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       JDBC_PARAMS: "useSSL=true"
-      KEYCLOAK_HOSTNAME: "yivisso.com"
+      KC_HTTPS_CERTIFICATE_FILE: "/opt/keycloak/certs/fullchain.pem"
+      KC_HTTPS_CERTIFICATE_KEY_FILE: "/opt/keycloak/certs/privkey.pem"
+      KC_HOSTNAME: "yivisso.com"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
     ports:
       - '8443:8443'
     depends_on:

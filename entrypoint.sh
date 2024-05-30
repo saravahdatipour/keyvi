@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Start Keycloak server in the background with SSL configuration
-/opt/keycloak/bin/kc.sh start --hostname=${KEYCLOAK_HOSTNAME} --https-certificate-file="/opt/keycloak/certs/fullchain.pem" --https-certificate-key-file="/opt/keycloak/certs/privkey.pem" &
+/opt/keycloak/bin/kc.sh start --hostname=${KC_HOSTNAME} --https-certificate-file=${KC_HTTPS_CERTIFICATE_FILE} --https-certificate-key-file=${KC_HTTPS_CERTIFICATE_KEY_FILE} --hostname-strict=${KC_HOSTNAME_STRICT} --hostname-strict-https=${KC_HOSTNAME_STRICT_HTTPS} &
 
 # Wait for Keycloak to be ready
 echo "Waiting for Keycloak to start..."
