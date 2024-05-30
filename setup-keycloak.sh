@@ -28,7 +28,7 @@ runKeycloakConfigCli() {
 
   # run keycloak-config-cli
   java -jar "${BASEDIR}"/keycloak-config-cli.jar \
-      --keycloak.url=https://localhost:8443 \
+      --keycloak.url=https://yivisso.com \
       --keycloak.ssl-verify=false \
       --keycloak.user="${KEYCLOAK_ADMIN}" \
       --keycloak.password="${KEYCLOAK_ADMIN_PASSWORD}" \
@@ -48,7 +48,7 @@ runKeycloakCli() {
   fi
 
   # login to admin console
-  ${KCADM} config credentials --server https://localhost:8443 --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
+  ${KCADM} config credentials --server https://yivisso.com --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
 
   # project specific configurations
   # source "${BASEDIR}"/keycloak-cli-helpers.sh
