@@ -23,10 +23,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       JDBC_PARAMS: "useSSL=true"
       KEYCLOAK_HOSTNAME: yivisso.com
-    expose:
-      - '8443'
     ports:
-      - '9995:8443'
+      - '8443:8443'
     depends_on:
       - mysql
     healthcheck:
@@ -34,7 +32,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-volumes:
-  mysql_data_volume:
-    driver: local
