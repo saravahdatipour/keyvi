@@ -25,6 +25,8 @@ COPY entrypoint.sh /opt/keycloak/
 # Copy Let's Encrypt certificates into the Docker image
 COPY yivisso.com /opt/keycloak/certs
 
+RUN chmod 644 /opt/keycloak/certs/*
+
 RUN chmod +x /opt/keycloak/setup-keycloak.sh /opt/keycloak/entrypoint.sh
 
 ENTRYPOINT ["/opt/keycloak/entrypoint.sh"]
