@@ -14,7 +14,9 @@
                                 <div style="float:right; font-size: 80%; position: relative; top:-10px"><a href="${url.loginResetCredentialsUrl}">${msg("doForgotPassword")}</a></div>
                             </#if>
                         </div>
-
+                        <div style="text-align:center; margin-top:20px;">
+                            <img src="https://i.imgur.com/zRv63a4.jpeg" alt="Logo" style="width: 100px; height: 100px;">
+                        </div>
                         <div class="panel-body" >
                             <#if message?has_content>
                                 <div id="login-alert" class="alert alert-danger col-sm-12">
@@ -67,8 +69,6 @@
                                          <!-- Yivi Web Form Integration -->
                                      <#if enableYivi>
                                          <button id="start-popup" type="button">Login With Yivi</button>
-                                         <button type="button" class="${properties.kcButtonClass!}" id="start-popup">Login With Yivi</button>
-
 
                                      <#else>
                                          <p>Yivi is not enabled!</p>
