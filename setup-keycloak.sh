@@ -30,9 +30,9 @@ runKeycloakConfigCli() {
 
   # Run keycloak-config-cli with appropriate parameters
   java -jar "${BASEDIR}/keycloak-config-cli.jar" \
-      --keycloak.url=https://${KEYCLOAK_HOSTNAME} \
+      --keycloak.url=https://${KEYCLOAK_HOSTNAME}:8443 \
       --keycloak.ssl-verify=false \
-      --keycloak.user="${KEYCLOAK_ADMIN}" \
+      --keycloak.user="${KEYCLOAK_ADMIN}:8443" \
       --keycloak.password="${KEYCLOAK_ADMIN_PASSWORD}" \
       --keycloak.availability-check.enabled=true \
       --keycloak.availability-check.timeout=300s \
@@ -50,7 +50,7 @@ runKeycloakCli() {
   fi
 
   # Log in to the admin console
-  ${KCADM} config credentials --server https://${KEYCLOAK_HOSTNAME} --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
+  ${KCADM} config credentials --server https://${KEYCLOAK_HOSTNAME}:8443 --user "${KEYCLOAK_ADMIN}" --password "${KEYCLOAK_ADMIN_PASSWORD}" --realm master
 
   # Project specific configurations
   # Uncomment and update the following lines as needed for your setup
