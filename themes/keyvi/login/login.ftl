@@ -86,7 +86,7 @@
 
                         if (startPopupButton) {
                             let options = {
-                                debugging: true,
+                                debugging: false,
                                 language: 'en',
                                 translations: {
                                     header: 'Try this <i class="yivi-web-logo">Yivi</i> example',
