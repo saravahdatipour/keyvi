@@ -183,6 +183,8 @@ public class DisclosureAuthenticator implements Authenticator  {
 
     // Check if age over 18 verification is enabled and failed
     boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
+    LOG.infof("Enable Age Lower Over 18: %s, Age Over 18 value: %s", enableAgeLowerOver18, ageOver18);
+
     if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
         LOG.warn("Age over 18 verification failed or is missing.");
         return null;
