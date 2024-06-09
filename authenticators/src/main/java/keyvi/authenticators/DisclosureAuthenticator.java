@@ -183,22 +183,22 @@ public class DisclosureAuthenticator implements Authenticator  {
 
     // Check if age over 18 verification is enabled and failed
     boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
-    LOG.info("Enable Age Lower Over 18: %s, Age Over 18 value: %s", enableAgeLowerOver18, ageOver18);
+    LOG.warnf("Enable Age Lower Over 18: %s, Age Over 18 value: %s", enableAgeLowerOver18, ageOver18);
 
     if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
-        LOG.warn("Age over 18 verification failed or is missing.");
+        LOG.warnf("Age over 18 verification failed or is missing.");
         return null;
     }
 
     if (email == null) {
-        LOG.warn("Email is missing in the claims data.");
+        LOG.warnf("Email is missing in the claims data.");
         return null;
     }
 
     // Check if the user already exists
     UserModel existingUser = userProvider.getUserByEmail(realm, email);
     if (existingUser != null) {
-        LOG.info("User with email already exists");
+        LOG.warnf("User with email already exists");
         return existingUser;
     }
 
