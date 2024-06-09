@@ -143,76 +143,82 @@ public class DisclosureAuthenticator implements Authenticator  {
         }
     }
 
-    private UserModel initializeYiviAccount(AuthenticationFlowContext context, String claims)
-    {
-        KeycloakSession session = context.getSession();
-        RealmModel realm = context.getRealm();
-        UserProvider userProvider = session.users();
+    private UserModel initializeYiviAccount(AuthenticationFlowContext context, String claims) {
+    KeycloakSession session = context.getSession();
+    RealmModel realm = context.getRealm();
+    UserProvider userProvider = session.users();
 
-        // Parse claims JSON string using Gson
-        Gson gson = new Gson();
-        JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
+    // Parse claims JSON string using Gson
+    Gson gson = new Gson();
+    JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
 
-        String email = null;
-        String firstName = "Yivi";
-        String lastName = "User";
-        String country = null;
-        String city = null;
-        String university = null;
-        String ageOver18 = "no";
+    String email = null;
+    String firstName = "Yivi";
+    String lastName = "User";
+    String country = null;
+    String city = null;
+    String university = null;
+    String ageOver18 = "no";  
 
-        JsonArray disclosedArray = claimsData.getAsJsonArray("disclosed");
-        for (JsonElement arrayElement : disclosedArray) {
-            JsonArray array = arrayElement.getAsJsonArray();
-            for (JsonElement objElement : array) {
-                JsonObject obj = objElement.getAsJsonObject();
-                String id = obj.get("id").getAsString();
-                String rawValue = obj.get("rawvalue").getAsString();
-                if (Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier().equals(id)) {
-                    ageOver18 = rawValue;
-                } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier().equals(id)) {
-                    country = rawValue;
-                } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier().equals(id)) {
-                    city = rawValue;
-                } else if (Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier().equals(id)) {
-                    email = rawValue;
-                } else if (Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier().equals(id)) {
-                    university = rawValue;
-                }
+    JsonArray disclosedArray = claimsData.getAsJsonArray("disclosed");
+    for (JsonElement arrayElement : disclosedArray) {
+        JsonArray array = arrayElement.getAsJsonArray();
+        for (JsonElement objElement : array) {
+            JsonObject obj = objElement.getAsJsonObject();
+            String id = obj.get("id").getAsString();
+            String rawValue = obj.get("rawvalue").getAsString();
+            if (Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier().equals(id)) {
+                ageOver18 = rawValue;
+            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier().equals(id)) {
+                country = rawValue;
+            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier().equals(id)) {
+                city = rawValue;
+            } else if (Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier().equals(id)) {
+                email = rawValue;
+            } else if (Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier().equals(id)) {
+                university = rawValue;
             }
         }
-
-        if (email == null) {
-            LOG.warn("Email is missing in the claims data.");
-            return null;
-        }
-
-        // Check if the user already exists
-        UserModel existingUser = userProvider.getUserByEmail(realm, email);
-        if (existingUser != null) {
-            LOG.info("User with email already exists");
-            return existingUser;
-        }
-
-        // Create a new user
-        UserModel user = userProvider.addUser(realm, email);
-        user.setEnabled(true);
-        user.setEmail(email);
-        user.setUsername(email);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-
-        // Set user attributes
-        user.setSingleAttribute("ageOver18", ageOver18);
-        user.setSingleAttribute("country", country);
-        user.setSingleAttribute("city", city);
-        user.setSingleAttribute("university", university);
-
-        // Set a temporary password for the user
-        user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
-
-        return user;
     }
+
+    // Check if age over 18 verification is enabled and failed
+    boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
+    if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
+        LOG.warn("Age over 18 verification failed or is missing.");
+        return null;
+    }
+
+    if (email == null) {
+        LOG.warn("Email is missing in the claims data.");
+        return null;
+    }
+
+    // Check if the user already exists
+    UserModel existingUser = userProvider.getUserByEmail(realm, email);
+    if (existingUser != null) {
+        LOG.info("User with email already exists");
+        return existingUser;
+    }
+
+    // Create a new user
+    UserModel user = userProvider.addUser(realm, email);
+    user.setEnabled(true);
+    user.setEmail(email);
+    user.setUsername(email);
+    user.setFirstName(firstName);
+    user.setLastName(lastName);
+
+    // Set user attributes
+    user.setSingleAttribute("ageOver18", ageOver18);
+    user.setSingleAttribute("country", country);
+    user.setSingleAttribute("city", city);
+    user.setSingleAttribute("university", university);
+
+    // Set a temporary password for the user
+    user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
+
+    return user;
+}
 
     private void setRequiredAttributes(AuthenticationFlowContext context)
     {
