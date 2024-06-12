@@ -121,32 +121,29 @@ public class DisclosureAuthenticator implements Authenticator  {
         }
     }
 
-    private void handleYiviLogin(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
+private void handleYiviLogin(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
     String claims = formData.getFirst("claims");
 
     if (claims == null || claims.isEmpty()) {
         LOG.warnf("No claims data provided.");
-        showErrorsOnPage(context, Arrays.asList("Authentication failed: No claims data provided."));
+        context.form().setError("Authentication failed: No claims data provided.");
+        context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS);
         return;
     }
 
     LOG.warnf("Processing claims: %s", claims);
-Object result = this.initializeYiviAccount(context, claims);
-if (result instanceof UserModel) {
-    UserModel user = (UserModel) result;
-    if (user != null) {
+    Object result = this.initializeYiviAccount(context, claims);
+    if (result instanceof UserModel) {
+        UserModel user = (UserModel) result;
         context.setUser(user);
         context.success();
-    } else {
-        // This condition should theoretically never be true because `instanceof` would fail if `user` is null
-        LOG.warnf("No user object returned after account initialization.");
-        showErrorsOnPage(context, Arrays.asList("Failed to retrieve user after account initialization."));
-    }
-} else if (result instanceof List) {
-    List<String> errors = (List<String>) result;
-    if (!errors.isEmpty()) {
-        LOG.warnf("Errors occurred during Yivi account initialization: %s", String.join(", ", errors));
-        showErrorsOnPage(context, errors);
+    } else if (result instanceof List) {
+        List<String> errors = (List<String>) result;
+        if (!errors.isEmpty()) {
+            LOG.warnf("Errors occurred during Yivi account initialization: %s", String.join(", ", errors));
+            context.form().setError(String.join("\n", errors));
+            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS);
+        }
     }
 }
 
