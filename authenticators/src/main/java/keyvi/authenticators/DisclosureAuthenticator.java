@@ -128,11 +128,14 @@ private void handleYiviLogin(AuthenticationFlowContext context, MultivaluedMap<S
     String claims = formData.getFirst("claims");
 
     if (claims == null || claims.isEmpty()) {
-        LOG.warnf("No claims data provided.");
-        context.form().setError("Authentication failed: No claims data provided.");
-        context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS);
-        return;
-    }
+    LOG.warnf("No claims data provided.");
+    context.form().setError("Authentication failed: No claims data provided.");
+    // Create a response that will be shown to the user
+    Response challengeResponse = context.form().createErrorPage(Response.Status.BAD_REQUEST);
+    // Now pass both the error and the response to the failureChallenge method
+    context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challengeResponse);
+    return;
+}
 
     LOG.warnf("Processing claims: %s", claims);
     Object result = this.initializeYiviAccount(context, claims);
