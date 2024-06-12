@@ -181,8 +181,15 @@ public class DisclosureAuthenticator implements Authenticator  {
         }
     }
 
+
+    LOG.warnf("Logging function is working");  
+    Map<String, String> config = context.getAuthenticatorConfig().getConfig();
+    LOG.warnf("All config values: %s", config);
+    String enableAgeLowerOver18Config = config.get("enableAgeLowerOver18");
+    LOG.warnf("Enable Age Lower Over 18 config string: '%s'", enableAgeLowerOver18Config);
+    boolean enableAgeLowerOver18 = Boolean.parseBoolean(enableAgeLowerOver18Config);
     // Check if age over 18 verification is enabled and failed
-    boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
+    //boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
     LOG.warnf("Enable Age Lower Over 18: %s", enableAgeLowerOver18);
     LOG.warnf("Age Over 18 value: %s", ageOver18);
 
