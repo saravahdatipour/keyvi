@@ -122,35 +122,54 @@ public class DisclosureAuthenticator implements Authenticator  {
     }
 
     private void handleYiviLogin(AuthenticationFlowContext context, MultivaluedMap<String, String> formData) {
-        String claims = formData.getFirst("claims");
+    String claims = formData.getFirst("claims");
 
-        // Process the claims data
-        if (claims != null && !claims.isEmpty()) {
-            LOG.warnf("Claims are not empty!");
-            LOG.warnf("Claims Data: %s", claims);
-
-            // Initialize the Yivi account and set the user in the context
-            UserModel user = this.initializeYiviAccount(context, claims);
-            if (user != null) {
-                context.setUser(user);
-                context.success();
-            } else {
-                context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, context.form().createForm("yiviLoginError.ftl"));
-            }
-
-        } else {
-            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, context.form().createForm("yiviLoginError.ftl"));
-        }
+    if (claims == null || claims.isEmpty()) {
+        LOG.warnf("No claims data provided.");
+        showErrorsOnPage(context, Arrays.asList("Authentication failed: No claims data provided."));
+        return;
     }
 
-    private UserModel initializeYiviAccount(AuthenticationFlowContext context, String claims) {
+    LOG.warnf("Processing claims: %s", claims);
+Object result = this.initializeYiviAccount(context, claims);
+if (result instanceof UserModel) {
+    UserModel user = (UserModel) result;
+    if (user != null) {
+        context.setUser(user);
+        context.success();
+    } else {
+        // This condition should theoretically never be true because `instanceof` would fail if `user` is null
+        LOG.warnf("No user object returned after account initialization.");
+        showErrorsOnPage(context, Arrays.asList("Failed to retrieve user after account initialization."));
+    }
+} else if (result instanceof List) {
+    List<String> errors = (List<String>) result;
+    if (!errors.isEmpty()) {
+        LOG.warnf("Errors occurred during Yivi account initialization: %s", String.join(", ", errors));
+        showErrorsOnPage(context, errors);
+    }
+}
+
+private void showErrorsOnPage(AuthenticationFlowContext context, List<String> errors) {
+    context.form().setAttribute("errors", errors);
+    Response challenge = context.form().createForm("yiviLoginError.ftl");
+    context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+}
+
+    private Object initializeYiviAccount(AuthenticationFlowContext context, String claims) {
+    List<String> errors = new ArrayList<>();
     KeycloakSession session = context.getSession();
     RealmModel realm = context.getRealm();
     UserProvider userProvider = session.users();
 
-    // Parse claims JSON string using Gson
     Gson gson = new Gson();
-    JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
+    JsonObject claimsData;
+    try {
+        claimsData = gson.fromJson(claims, JsonObject.class);
+    } catch (JsonSyntaxException e) {
+        errors.add("Failed to parse claims data: " + e.getMessage());
+        return errors;  // Return the list of errors directly.
+    }
 
     String email = null;
     String firstName = "Yivi";
@@ -158,7 +177,7 @@ public class DisclosureAuthenticator implements Authenticator  {
     String country = null;
     String city = null;
     String university = null;
-    String ageOver18 = "no";  
+    String ageOver18 = "no";
 
     JsonArray disclosedArray = claimsData.getAsJsonArray("disclosed");
     for (JsonElement arrayElement : disclosedArray) {
@@ -167,69 +186,59 @@ public class DisclosureAuthenticator implements Authenticator  {
             JsonObject obj = objElement.getAsJsonObject();
             String id = obj.get("id").getAsString();
             String rawValue = obj.get("rawvalue").getAsString();
-            if (Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier().equals(id)) {
-                ageOver18 = rawValue;
-            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier().equals(id)) {
-                country = rawValue;
-            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier().equals(id)) {
-                city = rawValue;
-            } else if (Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier().equals(id)) {
-                email = rawValue;
-            } else if (Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier().equals(id)) {
-                university = rawValue;
+            switch (id) {
+                case Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18:
+                    ageOver18 = rawValue;
+                    break;
+                case Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY:
+                    country = rawValue;
+                    break;
+                case Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY:
+                    city = rawValue;
+                    break;
+                case Identifiers.Pbdf.EMAIL_EMAIL:
+                    email = rawValue;
+                    break;
+                case Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY:
+                    university = rawValue;
+                    break;
             }
         }
     }
 
-
-    LOG.warnf("Logging function is working");  
-    Map<String, String> config = context.getAuthenticatorConfig().getConfig();
-    LOG.warnf("All config values: %s", config);
-    String enableAgeLowerOver18Config = config.get("enableAgeLowerOver18");
-    LOG.warnf("Enable Age Lower Over 18 config string: '%s'", enableAgeLowerOver18Config);
-    boolean enableAgeLowerOver18 = Boolean.parseBoolean(enableAgeLowerOver18Config);
-    // Check if age over 18 verification is enabled and failed
-    //boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
-    LOG.warnf("Enable Age Lower Over 18: %s", enableAgeLowerOver18);
-    LOG.warnf("Age Over 18 value: %s", ageOver18);
-
-
+    boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().getOrDefault("enableAgeLowerOver18", "false"));
     if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
-        LOG.warnf("Age over 18 verification failed or is missing.");
-        return null;
+        errors.add("Age verification failed: User is not over 18.");
     }
-
     if (email == null) {
-        LOG.warnf("Email is missing in the claims data.");
-        return null;
+        errors.add("Email is missing in the claims data.");
     }
 
-    // Check if the user already exists
+    if (!errors.isEmpty()) {
+        return errors;  // Return the list of errors instead of null.
+    }
+
     UserModel existingUser = userProvider.getUserByEmail(realm, email);
     if (existingUser != null) {
-        LOG.warnf("User with email already exists");
         return existingUser;
     }
 
-    // Create a new user
-    UserModel user = userProvider.addUser(realm, email);
-    user.setEnabled(true);
-    user.setEmail(email);
-    user.setUsername(email);
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
+    UserModel newUser = userProvider.addUser(realm, email);
+    newUser.setEnabled(true);
+    newUser.setEmail(email);
+    newUser.setUsername(email);
+    newUser.setFirstName(firstName);
+    newUser.setLastName(lastName);
+    newUser.setSingleAttribute("ageOver18", ageOver18);
+    newUser.setSingleAttribute("country", country);
+    newUser.setSingleAttribute("city", city);
+    newUser.setSingleAttribute("university", university);
+    newUser.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
 
-    // Set user attributes
-    user.setSingleAttribute("ageOver18", ageOver18);
-    user.setSingleAttribute("country", country);
-    user.setSingleAttribute("city", city);
-    user.setSingleAttribute("university", university);
-
-    // Set a temporary password for the user
-    user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
-
-    return user;
+    return newUser;
 }
+
+
 
     private void setRequiredAttributes(AuthenticationFlowContext context)
     {
