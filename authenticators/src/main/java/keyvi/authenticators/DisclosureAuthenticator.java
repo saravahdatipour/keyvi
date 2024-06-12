@@ -17,6 +17,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.List;
+import java.util.ArrayList;
+import com.google.gson.JsonSyntaxException; 
 
 public class DisclosureAuthenticator implements Authenticator  {
     private static final Logger LOG = Logger.getLogger(DisclosureAuthenticator.class);
@@ -142,7 +145,8 @@ private void handleYiviLogin(AuthenticationFlowContext context, MultivaluedMap<S
         if (!errors.isEmpty()) {
             LOG.warnf("Errors occurred during Yivi account initialization: %s", String.join(", ", errors));
             context.form().setError(String.join("\n", errors));
-            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS);
+            Response response = context.form().createErrorPage(Response.Status.BAD_REQUEST);
+            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, response);
         }
     }
 }
