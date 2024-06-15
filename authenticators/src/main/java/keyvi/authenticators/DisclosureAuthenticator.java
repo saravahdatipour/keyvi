@@ -237,25 +237,23 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     if(enableMaskedAccount)
     {
         email = AccountMasker.generateMaskedEmail(email, maskedEmailDomain, maskedEmailKey);
-        String username = AccountMasker.generateHashedUsername(email); 
+        String username = AccountMasker.generateHashedUsername(email);
+        UserModel user = userProvider.addUser(realm, email); 
         user.setUsername(username);
         user.setEmail(email);  // Setting the masked email
     }
     else
     {
         //dont mask them store them as they are
+        UserModel user = userProvider.addUser(realm, email);
         user.setUsername(email);  
         user.setEmail(email);
     }
 
-
-    // Create a new user
-    UserModel user = userProvider.addUser(realm, email);
-    user.setEnabled(true);
-    user.setEmail(email);
-    user.setUsername(email);
     user.setFirstName(firstName);
     user.setLastName(lastName);
+    user.setEnabled(true);
+
 
     boolean isStorageDisabled = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("disableAttributeStorage"));
     if(!isStorageDisabled)
