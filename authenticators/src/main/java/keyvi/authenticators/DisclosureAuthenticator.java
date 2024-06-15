@@ -221,11 +221,11 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     }
 
     //create new account (user does not yet exist)
-    isAttributeStorageDisabled = FeatureManager.isFeatureEnabled("disableAttributeStorage", context);
+    boolean isAttributeStorageDisabled = FeatureManager.isFeatureEnabled("disableAttributeStorage", context);
     return this.createNewAccount(userProvider, realm, email, isAttributeStorageDisabled, ageOver18, country, city, university);
 }
 
-    private UserResult createNewAccount(UserProvider userProvider , RealmModel realm, String email, Boolean isAttributeStorageDisabled, String ageOver18, String country, String city, String university)
+    private UserResult createNewAccount(UserProvider userProvider , RealmModel realm, String email, boolean isAttributeStorageDisabled, String ageOver18, String country, String city, String university)
     {
         UserModel user = userProvider.addUser(realm, email);
         user.setUsername(email);
