@@ -1,5 +1,5 @@
 package keyvi.objects;
-
+import org.keycloak.models.UserModel;
 
 public class UserResult {
     private final UserModel user;
