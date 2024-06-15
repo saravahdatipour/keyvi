@@ -223,6 +223,15 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
         return new UserResult(null, "Email is missing in the claims data.");
     }
 
+    //checking masking state
+    boolean enableMaskedAccount = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableMaskedAccount"));
+    String maskedEmailDomain = context.getAuthenticatorConfig().getConfig().get("maskedAccountDomain");
+    String maskedEmailKey = context.getAuthenticatorConfig().getConfig().get("maskedAccountKey");
+    if(enableMaskedAccount)
+    {
+        email = AccountMasker.generateMaskedEmail(email, maskedEmailDomain, maskedEmailKey);
+    }
+
     // Check if the user already exists
     UserModel existingUser = userProvider.getUserByEmail(realm, email);
     if (existingUser != null) {
@@ -230,26 +239,10 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
         return new UserResult(existingUser, null);
     }
 
-    //masking
-    boolean enableMaskedAccount = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableMaskedAccount"));
-    String maskedEmailDomain = context.getAuthenticatorConfig().getConfig().get("maskedAccountDomain");
-    String maskedEmailKey = context.getAuthenticatorConfig().getConfig().get("maskedAccountKey");
-
-    UserModel user = null;
-
-    if (enableMaskedAccount) {
-        email = AccountMasker.generateMaskedEmail(email, maskedEmailDomain, maskedEmailKey);
-        String username = AccountMasker.generateHashedUsername(email); 
-        user = userProvider.addUser(realm, email);
-        user.setUsername(username);
-        user.setEmail(email);  
-    } else {
-        // Store them as they are without masking
-        user = userProvider.addUser(realm, email); 
-        user.setUsername(email);
-        user.setEmail(email);
-    }
-
+    //create new account (user does not yet exist)
+    UserModel user = userProvider.addUser(realm, email);
+    user.setUsername(email);
+    user.setEmail(email);  
     user.setFirstName(firstName);
     user.setLastName(lastName);
     user.setEnabled(true);
