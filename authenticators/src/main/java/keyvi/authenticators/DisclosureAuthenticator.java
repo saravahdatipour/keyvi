@@ -19,6 +19,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import keyvi.objects.UserResult; 
 import keyvi.utils.PasswordGenerator;
+import keyvi.utils.AccountMasker;
 
 
 public class DisclosureAuthenticator implements Authenticator  {
@@ -228,6 +229,25 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
         LOG.warnf("User with email already exists");
         return new UserResult(existingUser, null);
     }
+
+    //masking
+    boolean enableMaskedAccount = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableMaskedAccount"));
+    String maskedEmailDomain = context.getAuthenticatorConfig().getConfig().get("maskedAccountDomain");
+    String maskedEmailKey = context.getAuthenticatorConfig().getConfig().get("maskedAccountKey");
+    if(enableMaskedAccount)
+    {
+        email = AccountMasker.generateMaskedEmail(email, maskedEmailDomain, maskedEmailKey);
+        String username = AccountMasker.generateHashedUsername(email); 
+        user.setUsername(username);
+        user.setEmail(email);  // Setting the masked email
+    }
+    else
+    {
+        //dont mask them store them as they are
+        user.setUsername(email);  
+        user.setEmail(email);
+    }
+
 
     // Create a new user
     UserModel user = userProvider.addUser(realm, email);
