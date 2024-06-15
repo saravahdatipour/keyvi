@@ -51,7 +51,7 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public String getHelpText() {
-        return "This Authenticator does nothing for now. but Disclosure will be implemented soon";
+        return "Authenticator that handles attribute disclosure verification.";
     }
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
@@ -63,21 +63,6 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         enable_property.setDefaultValue("false");
         enable_property.setHelpText("Enable or disable using Yivi.");
         configProperties.add(enable_property);
-
-//        ProviderConfigProperty over_18= new ProviderConfigProperty();
-//        over_18.setName("over18property");
-//        over_18.setLabel("over18 property");
-//        over_18.setType(ProviderConfigProperty.BOOLEAN_TYPE);
-//        over_18.setDefaultValue("false");
-//        over_18.setHelpText("Enable or disable using over 18 credential.");
-//        configProperties.add(over_18);
-
-//        ProviderConfigProperty yivi_email= new ProviderConfigProperty();
-//        yivi_email.setName("yiviemail");
-//        yivi_email.setLabel("yivi email property");
-//        yivi_email.setType(ProviderConfigProperty.BOOLEAN_TYPE);
-//        yivi_email.setHelpText("Enable or disable using email credential");
-//        configProperties.add(yivi_email);
 
         ProviderConfigProperty country = new ProviderConfigProperty();
         this.initiatizeConfigProperty("enableCountry", "yivi country property", "It enables or disables using country in request", country);
@@ -98,6 +83,15 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         ProviderConfigProperty studentCardUniversity = new ProviderConfigProperty();
         this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property", "It enables or disables using university in request", studentCardUniversity);
         configProperties.add(studentCardUniversity);
+
+        ProviderConfigProperty disableAttributeStorage = new ProviderConfigProperty();
+        disableAttributeStorage.setName("disableAttributeStorage");
+        disableAttributeStorage.setLabel("Disable Attribute Storage");
+        disableAttributeStorage.setType(ProviderConfigProperty.BOOLEAN_TYPE);
+        disableAttributeStorage.setDefaultValue("false");
+        disableAttributeStorage.setHelpText("If true, attributes will not be stored after verification.");
+        
+        configProperties.add(disableAttributeStorage);
 
         return configProperties;
     }
