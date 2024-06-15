@@ -24,7 +24,7 @@ public static void setRequiredAttributes(AuthenticationFlowContext context)
         context.form().setAttribute("identifiersStringified", identifiersStringified);
 }
 
-    private String prepareIdentifiersForFTL(boolean enableCountry, boolean enableAgeLowerOver18, boolean enableEmailEmail, boolean enableAddressCity, boolean enableStudentCardUniversity) {
+    private static String prepareIdentifiersForFTL(boolean enableCountry, boolean enableAgeLowerOver18, boolean enableEmailEmail, boolean enableAddressCity, boolean enableStudentCardUniversity) {
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("[");
 
