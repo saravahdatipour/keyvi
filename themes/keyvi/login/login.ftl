@@ -78,58 +78,62 @@
                                      </#if>
 
                             <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const startPopupButton = document.getElementById('start-popup');
-                        const claimsInput = document.getElementById('claims');
-                        const loginMethodInput = document.getElementById('login-method');
+document.addEventListener('DOMContentLoaded', function() {
+    const startPopupButton = document.getElementById('start-popup');
+    const claimsInput = document.getElementById('claims');
+    const loginMethodInput = document.getElementById('login-method');
 
-                        if (startPopupButton) {
-                             let identifiersStringified = ${identifiersStringified?no_esc}; 
-                            console.log("Identifiers Stringified:", identifiersStringified);
-
-                            let options = {
-                                debugging: false,
-                                language: 'en',
-                                translations: {
-                                    header: 'Try this <i class="yivi-web-logo">Yivi</i> example',
-                                    loading: 'Just one second please!'
-                                },
-                                session: {
-                                    url: 'https://catchthebugs.com',
-                                    start: {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            "@context": "https://irma.app/ld/request/disclosure/v2",
-                                            "disclose": {"attributes": { "irma-demo.MijnOverheid.ageLower.over18": "yes"}}
-                                        })
-                                    },
-                                }
-                            };
-
-                            let yiviPopup = window.yivi.newPopup(options);
-
-                            startPopupButton.onclick = () => {
-                                loginMethodInput.value = 'yivi';
-                                yiviPopup.start()
-                                    .then(result => {
-                                        claimsInput.value = JSON.stringify(result);
-                                        document.getElementById('kc-form-login').submit();
-                                    })
-                                    .catch(error => {
-                                        if (error === 'Aborted') {
-                                            console.log('We closed it ourselves, so no problem 😅');
-                                            return;
-                                        }
-                                        console.error("Couldn't do what you asked 😢", error);
-                                    })
-                                    .finally(() => yiviPopup = window.yivi.newPopup(options));
-                            };
+    if (startPopupButton) {
+        let options = {
+            debugging: false,
+            language: 'en',
+            translations: {
+                header: 'Try this <i class="yivi-web-logo">Yivi</i> example',
+                loading: 'Just one second please!'
+            },
+            session: {
+                url: 'https://catchthebugs.com',
+                start: {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "@context": "https://irma.app/ld/request/disclosure/v2",
+                        "disclose": {
+                            "attributes": {
+                                "irma-demo.MijnOverheid.ageLower.over18": "yes"
+                            }
                         }
-                    });
+                    })
+                },
+            }
+        };
+
+        let yiviPopup = window.yivi.newPopup(options);
+
+        startPopupButton.onclick = () => {
+            loginMethodInput.value = 'yivi';
+            yiviPopup.start()
+                .then(result => {
+                    claimsInput.value = JSON.stringify(result);
+                    document.getElementById('kc-form-login').submit();
+                })
+                .catch(error => {
+                    if (error === 'Aborted') {
+                        console.log('We closed it ourselves, so no problem 😅');
+                        return;
+                    }
+                    console.error("Couldn't do what you asked 😢", error);
+                })
+                .finally(() => {
+                    yiviPopup = window.yivi.newPopup(options); // Reinitialize the popup for potential reuse
+                });
+        };
+    }
+});
 </script>
+
 
 
 
