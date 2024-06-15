@@ -100,7 +100,7 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         enableMasked.setType(ProviderConfigProperty.BOOLEAN_TYPE);
         enableMasked.setDefaultValue("false");
         enableMasked.setHelpText("Enable or disable masked account feature.");
-        config.add(enableMasked);
+        configProperties.add(enableMasked);
 
         ProviderConfigProperty domainProperty = new ProviderConfigProperty();
         domainProperty.setName("maskedAccountDomain");
@@ -108,7 +108,7 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         domainProperty.setType(ProviderConfigProperty.STRING_TYPE);
         domainProperty.setDefaultValue("@yivisso.com");
         domainProperty.setHelpText("Specify the domain to use for masked accounts. For example @yivisso.com");
-        config.add(domainProperty);
+        configProperties.add(domainProperty);
 
         ProviderConfigProperty keyProperty = new ProviderConfigProperty();
         keyProperty.setName("maskedAccountKey");
@@ -116,7 +116,7 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         keyProperty.setType(ProviderConfigProperty.STRING_TYPE);
         keyProperty.setDefaultValue("keyvi-masked");
         keyProperty.setHelpText("Specify the key prefix for masked accounts. For example keyvi-masked");
-        config.add(keyProperty);
+        configProperties.add(keyProperty);
 
         return configProperties;
     }
