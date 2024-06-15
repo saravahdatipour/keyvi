@@ -237,11 +237,15 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     user.setFirstName(firstName);
     user.setLastName(lastName);
 
-    // Set user attributes
-    user.setSingleAttribute("ageOver18", ageOver18);
-    user.setSingleAttribute("country", country);
-    user.setSingleAttribute("city", city);
-    user.setSingleAttribute("university", university);
+    boolean isStorageDisabled = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("disableAttributeStorage"));
+    if(!isStorageDisabled)
+    {
+        // Set user attributes
+        user.setSingleAttribute("ageOver18", ageOver18);
+        user.setSingleAttribute("country", country);
+        user.setSingleAttribute("city", city);
+        user.setSingleAttribute("university", university);
+    }
 
     // Set a temporary password for the user
     String temporaryPassword = PasswordGenerator.generateSecurePassword();
