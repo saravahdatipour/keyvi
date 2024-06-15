@@ -130,20 +130,35 @@ public class DisclosureAuthenticator implements Authenticator  {
             LOG.warnf("Claims Data: %s", claims);
 
             // Initialize the Yivi account and set the user in the context
-            UserModel user = this.initializeYiviAccount(context, claims);
+            Pair<UserModel, String> result = this.initializeYiviAccount(context, claims);
+            UserModel user = result.getFirst();
+            String errorMessage = result.getSecond();
             if (user != null) {
                 context.setUser(user);
                 context.success();
             } else {
-                context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, context.form().createForm("yiviLoginError.ftl"));
+                LOG.warnf("error message should show up on screen for failed yivi login");
+                 Response challenge = context.form()
+                .setAttribute("login_method", "yivi")  // Keep the same login method
+                .setError(errorMessage)  // Pass the error message
+                .createLoginUsernamePassword();  // Use the form originally intended for Yivi login
+
+                context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             }
 
         } else {
-            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, context.form().createForm("yiviLoginError.ftl"));
+            // Handle missing claims data in a similar way
+        LOG.warnf("Claims data missing error should show up now on screen.");
+         Response challenge = context.form()
+            .setAttribute("login_method", "yivi")
+            .setError("Claims data is missing.")
+            .createLoginUsernamePassword();
+
+        context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
         }
     }
 
-    private UserModel initializeYiviAccount(AuthenticationFlowContext context, String claims) {
+private Pair<UserModel, String> initializeYiviAccount(AuthenticationFlowContext context, String claims) {
     KeycloakSession session = context.getSession();
     RealmModel realm = context.getRealm();
     UserProvider userProvider = session.users();
@@ -194,21 +209,19 @@ public class DisclosureAuthenticator implements Authenticator  {
     LOG.warnf("Age Over 18 value: %s", ageOver18);
 
 
-    if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
-        LOG.warnf("Age over 18 verification failed or is missing.");
-        return null;
+     if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
+        return new Pair<>(null, "Age verification failed or is missing. Must be over 18.");
     }
 
-    if (email == null) {
-        LOG.warnf("Email is missing in the claims data.");
-        return null;
+     if (email == null) {
+        return new Pair<>(null, "Email is missing in the claims data.");
     }
 
     // Check if the user already exists
     UserModel existingUser = userProvider.getUserByEmail(realm, email);
     if (existingUser != null) {
         LOG.warnf("User with email already exists");
-        return existingUser;
+        return new Pair<>(existingUser, null);
     }
 
     // Create a new user
@@ -228,7 +241,7 @@ public class DisclosureAuthenticator implements Authenticator  {
     // Set a temporary password for the user
     user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
 
-    return user;
+    return new Pair<>(user, null);
 }
 
     private void setRequiredAttributes(AuthenticationFlowContext context)
