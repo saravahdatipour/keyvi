@@ -209,8 +209,7 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     String enableAgeLowerOver18Config = config.get("enableAgeLowerOver18");
     LOG.warnf("Enable Age Lower Over 18 config string: '%s'", enableAgeLowerOver18Config);
     boolean enableAgeLowerOver18 = Boolean.parseBoolean(enableAgeLowerOver18Config);
-    // Check if age over 18 verification is enabled and failed
-    //boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
+
     LOG.warnf("Enable Age Lower Over 18: %s", enableAgeLowerOver18);
     LOG.warnf("Age Over 18 value: %s", ageOver18);
 
@@ -264,6 +263,11 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
 
     return new UserResult(user, null);
 }
+
+    private UserResult createNewAccount(AuthenticationFlowContext context , RealmModel realm, String email, Boolean shouldBeMasked, Boolean isAttributeStorageDisabled)
+    {
+
+    }
 
     private void setRequiredAttributes(AuthenticationFlowContext context)
     {
