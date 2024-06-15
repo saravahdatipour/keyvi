@@ -234,19 +234,19 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     boolean enableMaskedAccount = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableMaskedAccount"));
     String maskedEmailDomain = context.getAuthenticatorConfig().getConfig().get("maskedAccountDomain");
     String maskedEmailKey = context.getAuthenticatorConfig().getConfig().get("maskedAccountKey");
-    if(enableMaskedAccount)
-    {
+
+    UserModel user = null;
+
+    if (enableMaskedAccount) {
         email = AccountMasker.generateMaskedEmail(email, maskedEmailDomain, maskedEmailKey);
-        String username = AccountMasker.generateHashedUsername(email);
-        UserModel user = userProvider.addUser(realm, email); 
+        String username = AccountMasker.generateHashedUsername(email); 
+        user = userProvider.addUser(realm, username);
         user.setUsername(username);
-        user.setEmail(email);  // Setting the masked email
-    }
-    else
-    {
-        //dont mask them store them as they are
-        UserModel user = userProvider.addUser(realm, email);
-        user.setUsername(email);  
+        user.setEmail(email);  
+    } else {
+        // Store them as they are without masking
+        user = userProvider.addUser(realm, email); 
+        user.setUsername(email);
         user.setEmail(email);
     }
 
