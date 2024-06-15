@@ -17,6 +17,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import keyvi.objects.UserResult; 
+
 
 public class DisclosureAuthenticator implements Authenticator  {
     private static final Logger LOG = Logger.getLogger(DisclosureAuthenticator.class);
@@ -130,9 +132,9 @@ public class DisclosureAuthenticator implements Authenticator  {
             LOG.warnf("Claims Data: %s", claims);
 
             // Initialize the Yivi account and set the user in the context
-            Pair<UserModel, String> result = this.initializeYiviAccount(context, claims);
-            UserModel user = result.getFirst();
-            String errorMessage = result.getSecond();
+            UserResult result = this.initializeYiviAccount(context, claims);
+            UserModel user = result.getUser();
+            String errorMessage = result.getErrorMessage();
             if (user != null) {
                 context.setUser(user);
                 context.success();
@@ -158,7 +160,7 @@ public class DisclosureAuthenticator implements Authenticator  {
         }
     }
 
-private Pair<UserModel, String> initializeYiviAccount(AuthenticationFlowContext context, String claims) {
+private UserResult initializeYiviAccount(AuthenticationFlowContext context, String claims) {
     KeycloakSession session = context.getSession();
     RealmModel realm = context.getRealm();
     UserProvider userProvider = session.users();
@@ -210,18 +212,18 @@ private Pair<UserModel, String> initializeYiviAccount(AuthenticationFlowContext 
 
 
      if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
-        return new Pair<>(null, "Age verification failed or is missing. Must be over 18.");
+        return new UserResult(null, "Age verification failed or is missing. Must be over 18.");
     }
 
      if (email == null) {
-        return new Pair<>(null, "Email is missing in the claims data.");
+        return new UserResult(null, "Email is missing in the claims data.");
     }
 
     // Check if the user already exists
     UserModel existingUser = userProvider.getUserByEmail(realm, email);
     if (existingUser != null) {
         LOG.warnf("User with email already exists");
-        return new Pair<>(existingUser, null);
+        return new UserResult(existingUser, null);
     }
 
     // Create a new user
@@ -241,7 +243,7 @@ private Pair<UserModel, String> initializeYiviAccount(AuthenticationFlowContext 
     // Set a temporary password for the user
     user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
 
-    return new Pair<>(user, null);
+    return new UserResult(user, null);
 }
 
     private void setRequiredAttributes(AuthenticationFlowContext context)
