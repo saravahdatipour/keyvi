@@ -18,6 +18,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import keyvi.objects.UserResult; 
+import keyvi.utils.PasswordGenerator;
 
 
 public class DisclosureAuthenticator implements Authenticator  {
@@ -243,7 +244,8 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     user.setSingleAttribute("university", university);
 
     // Set a temporary password for the user
-    user.credentialManager().updateCredential(UserCredentialModel.password("temporaryPassword"));
+    String temporaryPassword = PasswordGenerator.generateSecurePassword();
+    user.credentialManager().updateCredential(UserCredentialModel.password(temporaryPassword));
 
     return new UserResult(user, null);
 }
