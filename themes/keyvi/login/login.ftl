@@ -103,7 +103,7 @@
                                         },
                                         body: JSON.stringify({
                                             "@context": "https://irma.app/ld/request/disclosure/v2",
-                                            "disclose": identifiersStringified
+                                            "disclose": {"attributes": { "irma-demo.MijnOverheid.ageLower.over18": "yes"}}
                                         })
                                     },
                                 }
