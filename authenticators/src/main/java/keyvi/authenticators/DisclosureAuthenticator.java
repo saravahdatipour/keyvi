@@ -240,7 +240,7 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     if (enableMaskedAccount) {
         email = AccountMasker.generateMaskedEmail(email, maskedEmailDomain, maskedEmailKey);
         String username = AccountMasker.generateHashedUsername(email); 
-        user = userProvider.addUser(realm, username);
+        user = userProvider.addUser(realm, email);
         user.setUsername(username);
         user.setEmail(email);  
     } else {
