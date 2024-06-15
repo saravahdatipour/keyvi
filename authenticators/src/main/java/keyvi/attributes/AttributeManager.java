@@ -20,65 +20,68 @@ public static void setRequiredAttributes(AuthenticationFlowContext context)
         boolean enableAddressCity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAddressCity"));
         boolean enableStudentCardUniversity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableStudentCardUniversity"));
 
-        String identifiersStringified = prepareIdentifiersForFTL(enableCountry, enableAgeLowerOver18, enableEmailEmail, enableAddressCity, enableStudentCardUniversity);
+        // Determine whether to force "yes" value for all attributes
+        boolean forceYesForAll = true; // Set based on configuration or a fixed value
+
+        // Generate the identifiers string with possible enforcement of "yes" values
+        String identifiersStringified = prepareIdentifiersForFTL(enableCountry, enableAgeLowerOver18, enableEmailEmail, enableAddressCity, enableStudentCardUniversity, forceYesForAll);
         context.form().setAttribute("identifiersStringified", identifiersStringified);
 }
 
-    private static String prepareIdentifiersForFTL(boolean enableCountry, boolean enableAgeLowerOver18, boolean enableEmailEmail, boolean enableAddressCity, boolean enableStudentCardUniversity) {
-        StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("[");
+    private static String prepareIdentifiersForFTL(boolean enableCountry, boolean enableAgeLowerOver18, boolean enableEmailEmail, boolean enableAddressCity, boolean enableStudentCardUniversity, boolean forceYesForAll) {
+    StringBuilder jsonBuilder = new StringBuilder();
+    jsonBuilder.append("{\"content\":[");
 
-        boolean isFirstGroup = true;
+    List<String> sections = new ArrayList<>();
 
-        // Conditionally add identifiers based on enabled flags
-        if (enableAgeLowerOver18) {
-            if (!isFirstGroup) jsonBuilder.append(",");
-            jsonBuilder.append("[[\"");
-            jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier());
-            jsonBuilder.append("\"]]");
-            isFirstGroup = false;
-        }
-
-        if (enableCountry || enableAddressCity) {
-            if (!isFirstGroup) jsonBuilder.append(",");
-            jsonBuilder.append("[[");
-            if (enableCountry) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier());
-                jsonBuilder.append("\"");
-                if (enableAddressCity) jsonBuilder.append(",");
-            }
-            if (enableAddressCity) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier());
-                jsonBuilder.append("\"");
-            }
-            jsonBuilder.append("]]");
-            isFirstGroup = false;
-        }
-
-        if (enableEmailEmail || enableStudentCardUniversity) {
-            if (!isFirstGroup) jsonBuilder.append(",");
-            jsonBuilder.append("[[");
-            if (enableEmailEmail) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier());
-                jsonBuilder.append("\"");
-                if (enableStudentCardUniversity) jsonBuilder.append(",");
-            }
-            if (enableStudentCardUniversity) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier());
-                jsonBuilder.append("\"");
-            }
-            jsonBuilder.append("]]");
-        }
-
-        jsonBuilder.append("]");
-
-        // Convert the StringBuilder content to a string
-        return jsonBuilder.toString();
+    if (enableAgeLowerOver18) {
+        sections.add(createSection("Over 18", Arrays.asList("irma-demo.MijnOverheid.ageLower.over18"), forceYesForAll));
     }
+
+    if (enableCountry) {
+        sections.add(createSection("Country", Arrays.asList("irma-demo.MijnOverheid.address.country"), forceYesForAll));
+    }
+
+    if (enableAddressCity) {
+        sections.add(createSection("City", Arrays.asList("irma-demo.MijnOverheid.address.city"), forceYesForAll));
+    }
+
+    if (enableEmailEmail) {
+        sections.add(createSection("Email", Arrays.asList("pbdf.sidn-pbdf.email.email"), forceYesForAll));
+    }
+
+    if (enableStudentCardUniversity) {
+        sections.add(createSection("University", Arrays.asList("irma-demo.RU.studentCard.university"), forceYesForAll));
+    }
+
+    jsonBuilder.append(String.join(",", sections));
+    jsonBuilder.append("]}");
+
+    return jsonBuilder.toString();
+}
+
+private static String createSection(String label, List<String> attributes, boolean forceYes) {
+    StringBuilder sectionBuilder = new StringBuilder();
+    sectionBuilder.append("{\"label\":\"").append(label).append("\",");
+
+    if (forceYes) {
+        sectionBuilder.append("\"attributes\":{");
+        List<String> attrs = new ArrayList<>();
+        for (String attr : attributes) {
+            attrs.add("\"" + attr + "\":\"yes\"");
+        }
+        sectionBuilder.append(String.join(",", attrs));
+        sectionBuilder.append("}");
+    } else {
+        sectionBuilder.append("\"attributes\":[");
+        sectionBuilder.append(attributes.stream().map(attr -> "\"" + attr + "\"").collect(Collectors.joining(",")));
+        sectionBuilder.append("]");
+    }
+
+    sectionBuilder.append("}");
+    return sectionBuilder.toString();
+}
+
 
 
 // private Array fetchRequiredAttributes()
