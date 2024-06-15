@@ -84,6 +84,9 @@
                         const loginMethodInput = document.getElementById('login-method');
 
                         if (startPopupButton) {
+                             let identifiersStringified = ${identifiersStringified?no_esc}; 
+                            console.log("Identifiers Stringified:", identifiersStringified);
+
                             let options = {
                                 debugging: false,
                                 language: 'en',
@@ -100,7 +103,7 @@
                                         },
                                         body: JSON.stringify({
                                             "@context": "https://irma.app/ld/request/disclosure/v2",
-                                            "disclose": ${identifiersStringified?no_esc}
+                                            "disclose": identifiersStringified
                                         })
                                     },
                                 }
