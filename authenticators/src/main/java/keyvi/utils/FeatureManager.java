@@ -1,10 +1,20 @@
+package keyvi.utils;
 
-public static bool isFeatureEnabled(String featureKey, AuthenticationFlowContext context)
+import org.keycloak.authentication.AuthenticationFlowContext;
+
+
+public class FeatureManager
 {
-    return Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get(featureKey))
+
+public static Boolean isFeatureEnabled(String featureKey, AuthenticationFlowContext context)
+{
+    return Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get(featureKey));
 }
 
-public static string getFeatureValue(String featureKey, AuthenticationFlowContext context)
+public static String getFeatureValue(String featureKey, AuthenticationFlowContext context)
 {
-    return context.getAuthenticatorConfig().getConfig().get(featureKey)
+    return context.getAuthenticatorConfig().getConfig().get(featureKey);
 } 
+
+
+}

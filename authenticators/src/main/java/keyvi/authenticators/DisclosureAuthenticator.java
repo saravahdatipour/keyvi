@@ -20,6 +20,8 @@ import com.google.gson.JsonObject;
 import keyvi.objects.UserResult; 
 import keyvi.utils.PasswordGenerator;
 import keyvi.utils.AccountMasker;
+import keyvi.attributes.AttributeManager;
+import keyvi.utils.FeatureManager;
 
 
 public class DisclosureAuthenticator implements Authenticator  {
@@ -27,17 +29,11 @@ public class DisclosureAuthenticator implements Authenticator  {
     public static final String USERNAME_PASSWORD_LOGIN_FORM = "backup.ftl";
     public static boolean YIVI_TOGGLE = true;
 
-
-    // TODO: write authenticate logic
     @Override
     public void authenticate(AuthenticationFlowContext context) {
-        LOG.debugf("authenticate");
-        // Pass the configuration value to the form
-        this.setRequiredAttributes(context);
+        AttributeManager.setRequiredAttributes(context);
 
-        // Proceed with challenge
         context.challenge(context.form().createLoginUsernamePassword());
-
     }
 
 
@@ -63,12 +59,6 @@ public class DisclosureAuthenticator implements Authenticator  {
 
     @Override
     public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel, UserModel userModel) {
-
-    }
-
-    public void authenticateWithYivi(AuthenticationFlowContext context){
-
-        //has logic for redirecting to yivi and translating a response to credentials keycloak understands
     }
 
     @Override
@@ -92,7 +82,7 @@ public class DisclosureAuthenticator implements Authenticator  {
         if (Validation.isBlank(username) || Validation.isBlank(password)) {
             // Form is empty somewhere
             context.getEvent().error("Username is missing");
-            this.setRequiredAttributes(context);
+            AttributeManager.setRequiredAttributes(context);
             Response challenge = context.form().createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
@@ -103,7 +93,7 @@ public class DisclosureAuthenticator implements Authenticator  {
         if (user == null) {
             // No user matched
             context.getEvent().error(Errors.USER_NOT_FOUND);
-            this.setRequiredAttributes(context);
+            AttributeManager.setRequiredAttributes(context);
             Response challenge = context.form().setError(Messages.INVALID_USER).createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_USER, challenge);
             return;
@@ -119,7 +109,7 @@ public class DisclosureAuthenticator implements Authenticator  {
         } else {
             // Password is invalid
             context.getEvent().user(user).error(Errors.INVALID_USER_CREDENTIALS);
-            this.setRequiredAttributes(context);
+            AttributeManager.setRequiredAttributes(context);
             Response challenge = context.form().setError(Messages.INVALID_PASSWORD).createLoginUsernamePassword();
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
         }
@@ -142,7 +132,7 @@ public class DisclosureAuthenticator implements Authenticator  {
                 context.success();
             } else {
                 LOG.warnf("error message should show up on screen for failed yivi login");
-                this.setRequiredAttributes(context);
+                AttributeManager.setRequiredAttributes(context);
                 Response challenge = context.form()
                 .setAttribute("login_method", "yivi")  // Keep the same login method
                 .setError(errorMessage)  // Pass the error message
@@ -154,7 +144,7 @@ public class DisclosureAuthenticator implements Authenticator  {
         } else {
             // Handle missing claims data in a similar way
         LOG.warnf("Claims data missing error should show up now on screen.");
-        this.setRequiredAttributes(context);
+        AttributeManager.setRequiredAttributes(context);
          Response challenge = context.form()
             .setAttribute("login_method", "yivi")
             .setError("Claims data is missing.")
@@ -174,8 +164,6 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
 
     String email = null;
-    String firstName = "Yivi";
-    String lastName = "User";
     String country = null;
     String city = null;
     String university = null;
@@ -203,16 +191,10 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     }
 
 
-    LOG.warnf("Logging function is working");  
     Map<String, String> config = context.getAuthenticatorConfig().getConfig();
     LOG.warnf("All config values: %s", config);
-    String enableAgeLowerOver18Config = config.get("enableAgeLowerOver18");
-    LOG.warnf("Enable Age Lower Over 18 config string: '%s'", enableAgeLowerOver18Config);
-    boolean enableAgeLowerOver18 = Boolean.parseBoolean(enableAgeLowerOver18Config);
 
-    LOG.warnf("Enable Age Lower Over 18: %s", enableAgeLowerOver18);
-    LOG.warnf("Age Over 18 value: %s", ageOver18);
-
+    boolean enableAgeLowerOver18 = FeatureManager.isFeatureEnabled("enableAgeLowerOver18", context);
 
      if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
         return new UserResult(null, "Age verification failed or is missing. Must be over 18.");
@@ -223,9 +205,9 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     }
 
     //checking masking state
-    boolean enableMaskedAccount = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableMaskedAccount"));
-    String maskedEmailDomain = context.getAuthenticatorConfig().getConfig().get("maskedAccountDomain");
-    String maskedEmailKey = context.getAuthenticatorConfig().getConfig().get("maskedAccountKey");
+    boolean enableMaskedAccount = FeatureManager.isFeatureEnabled("enableMaskedAccount", context);
+    String maskedEmailDomain = FeatureManager.getFeatureValue("maskedAccountDomain", context);
+    String maskedEmailKey = FeatureManager.getFeatureValue("maskedAccountKey", context);
     if(enableMaskedAccount)
     {
         email = AccountMasker.generateMaskedEmail(email, maskedEmailDomain, maskedEmailKey);
@@ -239,106 +221,32 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     }
 
     //create new account (user does not yet exist)
-    UserModel user = userProvider.addUser(realm, email);
-    user.setUsername(email);
-    user.setEmail(email);  
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
-    user.setEnabled(true);
-
-
-    boolean isStorageDisabled = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("disableAttributeStorage"));
-    if(!isStorageDisabled)
-    {
-        // Set user attributes
-        user.setSingleAttribute("ageOver18", ageOver18);
-        user.setSingleAttribute("country", country);
-        user.setSingleAttribute("city", city);
-        user.setSingleAttribute("university", university);
-    }
-
-    // Set a temporary password for the user
-    String temporaryPassword = PasswordGenerator.generateSecurePassword();
-    user.credentialManager().updateCredential(UserCredentialModel.password(temporaryPassword));
-
-    return new UserResult(user, null);
+    isAttributeStorageDisabled = FeatureManager.isFeatureEnabled("disableAttributeStorage", context);
+    return this.createNewAccount(userProvider, realm, email, isAttributeStorageDisabled, ageOver18, country, city, university);
 }
 
-    private UserResult createNewAccount(AuthenticationFlowContext context , RealmModel realm, String email, Boolean shouldBeMasked, Boolean isAttributeStorageDisabled)
+    private UserResult createNewAccount(UserProvider userProvider , RealmModel realm, String email, Boolean isAttributeStorageDisabled, String ageOver18, String country, String city, String university)
     {
+        UserModel user = userProvider.addUser(realm, email);
+        user.setUsername(email);
+        user.setEmail(email);  
+        user.setFirstName("Yivi");
+        user.setLastName("User");
+        user.setEnabled(true);
 
-    }
-
-    private void setRequiredAttributes(AuthenticationFlowContext context)
-    {
-        boolean enableYivi = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableYivi"));
-        context.form().setAttribute("enableYivi", enableYivi);
-
-        boolean enableCountry = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableCountry"));
-        boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
-        boolean enableEmailEmail = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableEmailEmail"));
-        boolean enableAddressCity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAddressCity"));
-        boolean enableStudentCardUniversity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableStudentCardUniversity"));
-
-        String identifiersStringified = prepareIdentifiersForFTL(enableCountry, enableAgeLowerOver18, enableEmailEmail, enableAddressCity, enableStudentCardUniversity);
-        context.form().setAttribute("identifiersStringified", identifiersStringified);
-    }
-
-    // Private function to prepare the identifiers for FTL
-    private String prepareIdentifiersForFTL(boolean enableCountry, boolean enableAgeLowerOver18, boolean enableEmailEmail, boolean enableAddressCity, boolean enableStudentCardUniversity) {
-        StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("[");
-
-        boolean isFirstGroup = true;
-
-        // Conditionally add identifiers based on enabled flags
-        if (enableAgeLowerOver18) {
-            if (!isFirstGroup) jsonBuilder.append(",");
-            jsonBuilder.append("[[\"");
-            jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier());
-            jsonBuilder.append("\"]]");
-            isFirstGroup = false;
+        if(!isAttributeStorageDisabled)
+        {
+          // Set user attributes
+            user.setSingleAttribute("ageOver18", ageOver18);
+            user.setSingleAttribute("country", country);
+            user.setSingleAttribute("city", city);
+            user.setSingleAttribute("university", university);
         }
 
-        if (enableCountry || enableAddressCity) {
-            if (!isFirstGroup) jsonBuilder.append(",");
-            jsonBuilder.append("[[");
-            if (enableCountry) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier());
-                jsonBuilder.append("\"");
-                if (enableAddressCity) jsonBuilder.append(",");
-            }
-            if (enableAddressCity) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier());
-                jsonBuilder.append("\"");
-            }
-            jsonBuilder.append("]]");
-            isFirstGroup = false;
-        }
+        String temporaryPassword = PasswordGenerator.generateSecurePassword();
+        user.credentialManager().updateCredential(UserCredentialModel.password(temporaryPassword));
 
-        if (enableEmailEmail || enableStudentCardUniversity) {
-            if (!isFirstGroup) jsonBuilder.append(",");
-            jsonBuilder.append("[[");
-            if (enableEmailEmail) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier());
-                jsonBuilder.append("\"");
-                if (enableStudentCardUniversity) jsonBuilder.append(",");
-            }
-            if (enableStudentCardUniversity) {
-                jsonBuilder.append("\"");
-                jsonBuilder.append(Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier());
-                jsonBuilder.append("\"");
-            }
-            jsonBuilder.append("]]");
-        }
-
-        jsonBuilder.append("]");
-
-        // Convert the StringBuilder content to a string
-        return jsonBuilder.toString();
+        return new UserResult(user, null);
     }
 
 
