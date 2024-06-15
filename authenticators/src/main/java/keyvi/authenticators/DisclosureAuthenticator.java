@@ -142,6 +142,7 @@ public class DisclosureAuthenticator implements Authenticator  {
                 LOG.warnf("error message should show up on screen for failed yivi login");
                  Response challenge = context.form()
                 .setAttribute("login_method", "yivi")  // Keep the same login method
+                .setAttribute("enableYivi", true)
                 .setError(errorMessage)  // Pass the error message
                 .createLoginUsernamePassword();  // Use the form originally intended for Yivi login
 
@@ -153,6 +154,7 @@ public class DisclosureAuthenticator implements Authenticator  {
         LOG.warnf("Claims data missing error should show up now on screen.");
          Response challenge = context.form()
             .setAttribute("login_method", "yivi")
+            .setAttribute("enableYivi", true)
             .setError("Claims data is missing.")
             .createLoginUsernamePassword();
 

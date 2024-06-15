@@ -67,12 +67,11 @@
                                             </#list>
                                         </#if>
                                          <!-- Yivi Web Form Integration -->
-                                     <#if enableYivi>
+                                     <#if enableYivi?exists && enableYivi>
                                          <button id="start-popup" type="button">Login With Yivi</button>
-
-                                     <#else>
-                                         <p>Yivi is not enabled!</p>
-                                     </#if>
+                                    <#else>
+                                        <p>Yivi is not enabled!</p>
+                                    </#if>
 
                                      <#if countryIdentifier?has_content>
                                          ${countryIdentifier}
