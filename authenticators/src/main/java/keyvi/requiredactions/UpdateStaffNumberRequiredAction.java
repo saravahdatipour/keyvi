@@ -17,6 +17,8 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
+        Response challenge = context.form().createForm("required-action.ftl");
+        context.challenge(challenge);
     }
 
     @Override
