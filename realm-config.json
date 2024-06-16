@@ -133,6 +133,46 @@
         "backchannel.logout.session.required": "true",
         "backchannel.logout.revoke.offline.tokens": "false"
       }
-    }  
+    }
+    ,
+    {
+      "clientId": "mastodon-client",
+      "name": "Mastodon Client",
+      "description": "Client for Mastodon integration",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "https://edukite.net/auth/auth/openid_connect/callback"
+      ],
+      "webOrigins": [
+        "https://edukite.net/"
+      ],
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false, 
+      "bearerOnly": false,
+      "consentRequired": false,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "email",
+        "roles",
+        "phone"
+      ],
+      "optionalClientScopes": [
+        "offline_access",
+        "address",
+        "microprofile-jwt"
+      ],
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      }
+    }    
   ]
 }
