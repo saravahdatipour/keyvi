@@ -9,6 +9,8 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
@@ -28,6 +30,17 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
 
         Stream<FederatedIdentityModel> stream =  context.getSession().users().getFederatedIdentitiesStream(context.getRealm(), user);
         LOG.warnf("Identity stream is: %s", stream);
+
+        // Collect the stream elements into a list
+        List<FederatedIdentityModel> federatedIdentities = stream.collect(Collectors.toList());
+
+        // Log the federated identities
+        for (FederatedIdentityModel federatedIdentity : federatedIdentities) {
+            LOG.warnf("Federated Identity Provider: %s, User ID: %s, User Name: %s",
+                    federatedIdentity.getIdentityProvider(),
+                    federatedIdentity.getUserId(),
+                    federatedIdentity.getUserName());
+        }
 
         String serviceAccountLink = user.getServiceAccountClientLink();
         String identityProvider = user.getFederationLink();
