@@ -165,7 +165,7 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     String country = parsedAttributes.get("country").getAsString();
     String city = parsedAttributes.get("city").getAsString();
     String university = parsedAttributes.get("university").getAsString();
-    String ageOver18 = parsedAttributes.get("ageOver18").getAsString()
+    String ageOver18 = parsedAttributes.get("ageOver18").getAsString();
 
     Map<String, String> config = context.getAuthenticatorConfig().getConfig();
     LOG.warnf("All config values: %s", config);
