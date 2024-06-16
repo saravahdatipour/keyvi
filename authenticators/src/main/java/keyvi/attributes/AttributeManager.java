@@ -8,20 +8,41 @@ public class AttributeManager
 {
 
 
-public static void setRequiredAttributes(AuthenticationFlowContext context)
-{
+public static void setRequiredAttributes(AuthenticationFlowContext context) {
         boolean enableYivi = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableYivi"));
         context.form().setAttribute("enableYivi", enableYivi);
 
-        //todo: use feature manager
-        boolean enableCountry = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableCountry"));
-        boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
-        boolean enableEmailEmail = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableEmailEmail"));
-        boolean enableAddressCity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAddressCity"));
-        boolean enableStudentCardUniversity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableStudentCardUniversity"));
+        boolean onlyUseCustomConfig = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("onlyUseCustomConfig"));
+        String customDisclosureArray = context.getAuthenticatorConfig().getConfig().get("disclosureConfigYivi");
 
-        String identifiersStringified = prepareIdentifiersForFTL(enableCountry, enableAgeLowerOver18, enableEmailEmail, enableAddressCity, enableStudentCardUniversity);
+        String identifiersStringified;
+        if (onlyUseCustomConfig && customDisclosureArray != null && !customDisclosureArray.trim().isEmpty()) {
+        identifiersStringified = prepareCustomIdentifiersForFtl(customDisclosureArray.trim());
+        }   
+        else 
+        {
+            boolean enableCountry = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableCountry"));
+            boolean enableAgeLowerOver18 = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAgeLowerOver18"));
+            boolean enableEmailEmail = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableEmailEmail"));
+            boolean enableAddressCity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableAddressCity"));
+            boolean enableStudentCardUniversity = Boolean.parseBoolean(context.getAuthenticatorConfig().getConfig().get("enableStudentCardUniversity"));
+            identifiersStringified = prepareIdentifiersForFTL(enableCountry, enableAgeLowerOver18, enableEmailEmail, enableAddressCity, enableStudentCardUniversity);
+        }
         context.form().setAttribute("identifiersStringified", identifiersStringified);
+    }
+
+    public static String prepareCustomIdentifiersForFtl(String disclosureConfigYivi) {
+    if (disclosureConfigYivi.isEmpty()) {
+        return "[]"; // Return an empty JSON array as a default if nothing is provided
+    }
+
+    // Remove "disclose": if present to handle both cases where it is included or directly the array
+    String trimmedInput = disclosureConfigYivi.replace("\"disclose\":", "").trim();
+    if (trimmedInput.startsWith("[") && trimmedInput.endsWith("]")) {
+        return trimmedInput;
+    }
+
+    return "[]"; // Default fallback if the format is incorrect
 }
 
     private static String prepareIdentifiersForFTL(boolean enableCountry, boolean enableAgeLowerOver18, boolean enableEmailEmail, boolean enableAddressCity, boolean enableStudentCardUniversity) {

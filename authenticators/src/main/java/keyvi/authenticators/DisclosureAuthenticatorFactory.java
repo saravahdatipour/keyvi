@@ -118,11 +118,20 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property", "It enables or disables using university in request", studentCardUniversity);
         configProperties.add(studentCardUniversity);
 
+
+        ProviderConfigProperty useCustomConfig = new ProviderConfigProperty();
+        useCustomConfig.setName("onlyUseCustomConfig");
+        useCustomConfig.setLabel("Only Use Custom Disclosure Config");
+        useCustomConfig.setType(ProviderConfigProperty.BOOLEAN_TYPE);
+        useCustomConfig.setDefaultValue("false");
+        useCustomConfig.setHelpText("Enable to use custom disclosure JSON instead of default settings.");
+        configProperties.add(useCustomConfig);
+
         ProviderConfigProperty jsonProperty = new ProviderConfigProperty();
-        jsonProperty.setName("jsonConfig");
-        jsonProperty.setLabel("Custom JSON Configuration");
+        jsonProperty.setName("disclosureConfigYivi");
+        jsonProperty.setLabel("Custom Config Disclosure Array");
         jsonProperty.setType(ProviderConfigProperty.STRING_TYPE); 
-        jsonProperty.setHelpText("Enter JSON configuration here. Ensure it is a valid JSON string.");
+        jsonProperty.setHelpText("Enter Disclosure part of json string.");
         configProperties.add(jsonProperty);
 
         return configProperties;
