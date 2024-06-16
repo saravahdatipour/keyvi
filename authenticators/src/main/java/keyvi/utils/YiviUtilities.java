@@ -39,4 +39,11 @@ public class YiviUtilities {
 
         return result;
     }
+
+    public static String getJsonString(JsonObject jsonObject, String key) {
+        if (jsonObject != null && jsonObject.has(key) && !jsonObject.get(key).isJsonNull()) {
+            return jsonObject.get(key).getAsString();
+        }
+        return null;  // Return null if the key doesn't exist or the value is JsonNull
+    }
 }

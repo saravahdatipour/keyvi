@@ -161,11 +161,11 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     UserProvider userProvider = session.users();
 
     JsonObject parsedAttributes = YiviUtilities.parseDisclosedArray(claims);
-    String email = parsedAttributes.get("email").getAsString();
-    String country = parsedAttributes.get("country").getAsString();
-    String city = parsedAttributes.get("city").getAsString();
-    String university = parsedAttributes.get("university").getAsString();
-    String ageOver18 = parsedAttributes.get("ageOver18").getAsString();
+    String email = YiviUtilities.getJsonString(parsedAttributes, "email");
+    String country = YiviUtilities.getJsonString(parsedAttributes, "country");
+    String city = YiviUtilities.getJsonString(parsedAttributes, "city");
+    String university = YiviUtilities.getJsonString(parsedAttributes, "university");
+    String ageOver18 = YiviUtilities.getJsonString(parsedAttributes, "ageOver18");
 
     Map<String, String> config = context.getAuthenticatorConfig().getConfig();
     LOG.warnf("All config values: %s", config);
