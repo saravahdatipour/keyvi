@@ -46,4 +46,15 @@ public class YiviUtilities {
         }
         return null;  // Return null if the key doesn't exist or the value is JsonNull
     }
+
+    public static boolean isResponseValid(String claimsJson) {
+        JsonElement element = JsonParser.parseString(claimsJson);
+        if (element.isJsonObject()) {
+            JsonObject jsonObject = element.getAsJsonObject();
+            String status = getJsonString(jsonObject, "status");
+            String proofStatus = getJsonString(jsonObject, "proofStatus");
+            return "DONE".equals(status) && "VALID".equals(proofStatus);
+        }
+        return false;
+    }
 }

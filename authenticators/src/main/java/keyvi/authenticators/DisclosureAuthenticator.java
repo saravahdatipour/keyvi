@@ -160,6 +160,11 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     RealmModel realm = context.getRealm();
     UserProvider userProvider = session.users();
 
+    if(!YiviUtilities.isResponseValid(claims))
+    {
+        return new UserResult(null, "Yivi Response is not valid. Please try again!");
+    }
+    
     JsonObject parsedAttributes = YiviUtilities.parseDisclosedArray(claims);
     String email = YiviUtilities.getJsonString(parsedAttributes, "email");
     String country = YiviUtilities.getJsonString(parsedAttributes, "country");
