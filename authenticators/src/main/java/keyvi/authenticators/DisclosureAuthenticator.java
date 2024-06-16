@@ -22,6 +22,7 @@ import keyvi.utils.PasswordGenerator;
 import keyvi.utils.AccountMasker;
 import keyvi.attributes.AttributeManager;
 import keyvi.utils.FeatureManager;
+import keyvi.utils.YiviUtilities;
 
 
 public class DisclosureAuthenticator implements Authenticator  {
@@ -159,37 +160,12 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     RealmModel realm = context.getRealm();
     UserProvider userProvider = session.users();
 
-    // Parse claims JSON string using Gson
-    Gson gson = new Gson();
-    JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
-
-    String email = null;
-    String country = null;
-    String city = null;
-    String university = null;
-    String ageOver18 = "no";  
-
-    JsonArray disclosedArray = claimsData.getAsJsonArray("disclosed");
-    for (JsonElement arrayElement : disclosedArray) {
-        JsonArray array = arrayElement.getAsJsonArray();
-        for (JsonElement objElement : array) {
-            JsonObject obj = objElement.getAsJsonObject();
-            String id = obj.get("id").getAsString();
-            String rawValue = obj.get("rawvalue").getAsString();
-            if (Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier().equals(id)) {
-                ageOver18 = rawValue;
-            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier().equals(id)) {
-                country = rawValue;
-            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier().equals(id)) {
-                city = rawValue;
-            } else if (Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier().equals(id)) {
-                email = rawValue;
-            } else if (Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier().equals(id)) {
-                university = rawValue;
-            }
-        }
-    }
-
+    JsonObject parsedAttributes = YiviUtilities.parseDisclosedArray(claims);
+    String email = parsedAttributes.get("email").getAsString();
+    String country = parsedAttributes.get("country").getAsString();
+    String city = parsedAttributes.get("city").getAsString();
+    String university = parsedAttributes.get("university").getAsString();
+    String ageOver18 = parsedAttributes.get("ageOver18").getAsString()
 
     Map<String, String> config = context.getAuthenticatorConfig().getConfig();
     LOG.warnf("All config values: %s", config);
