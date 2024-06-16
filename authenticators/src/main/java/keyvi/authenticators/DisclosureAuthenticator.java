@@ -22,6 +22,7 @@ import keyvi.utils.PasswordGenerator;
 import keyvi.utils.AccountMasker;
 import keyvi.attributes.AttributeManager;
 import keyvi.utils.FeatureManager;
+import keyvi.utils.YiviUtilities;
 
 
 public class DisclosureAuthenticator implements Authenticator  {
@@ -159,37 +160,17 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     RealmModel realm = context.getRealm();
     UserProvider userProvider = session.users();
 
-    // Parse claims JSON string using Gson
-    Gson gson = new Gson();
-    JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
-
-    String email = null;
-    String country = null;
-    String city = null;
-    String university = null;
-    String ageOver18 = "no";  
-
-    JsonArray disclosedArray = claimsData.getAsJsonArray("disclosed");
-    for (JsonElement arrayElement : disclosedArray) {
-        JsonArray array = arrayElement.getAsJsonArray();
-        for (JsonElement objElement : array) {
-            JsonObject obj = objElement.getAsJsonObject();
-            String id = obj.get("id").getAsString();
-            String rawValue = obj.get("rawvalue").getAsString();
-            if (Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier().equals(id)) {
-                ageOver18 = rawValue;
-            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier().equals(id)) {
-                country = rawValue;
-            } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier().equals(id)) {
-                city = rawValue;
-            } else if (Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier().equals(id)) {
-                email = rawValue;
-            } else if (Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier().equals(id)) {
-                university = rawValue;
-            }
-        }
+    if(!YiviUtilities.isResponseValid(claims))
+    {
+        return new UserResult(null, "Yivi Response is not valid. Please try again!");
     }
-
+    
+    JsonObject parsedAttributes = YiviUtilities.parseDisclosedArray(claims);
+    String email = YiviUtilities.getJsonString(parsedAttributes, "email");
+    String country = YiviUtilities.getJsonString(parsedAttributes, "country");
+    String city = YiviUtilities.getJsonString(parsedAttributes, "city");
+    String university = YiviUtilities.getJsonString(parsedAttributes, "university");
+    String ageOver18 = YiviUtilities.getJsonString(parsedAttributes, "ageOver18");
 
     Map<String, String> config = context.getAuthenticatorConfig().getConfig();
     LOG.warnf("All config values: %s", config);
