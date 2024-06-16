@@ -94,6 +94,45 @@
         "offline_access",
         "microprofile-jwt"
       ]
-    }
+    },
+    {
+      "clientId": "wordpress-client",
+      "name": "WordPress Client",
+      "description": "Client for WordPress integration",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "https://sample-domain.xyz/blog"
+      ],
+      "webOrigins": [
+        "https://sample-domain.xyz"
+      ],
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false, 
+      "bearerOnly": false,
+      "consentRequired": false,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "email",
+        "roles",
+        "phone"
+      ],
+      "optionalClientScopes": [
+        "offline_access",
+        "address",
+        "microprofile-jwt"
+      ],
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      }
+    }  
   ]
 }
