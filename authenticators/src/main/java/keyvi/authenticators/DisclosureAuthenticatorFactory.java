@@ -64,36 +64,15 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         enable_property.setHelpText("Enable or disable using Yivi.");
         configProperties.add(enable_property);
 
-        ProviderConfigProperty country = new ProviderConfigProperty();
-        this.initiatizeConfigProperty("enableCountry", "yivi country property", "It enables or disables using country in request", country);
-        configProperties.add(country);
-
-        ProviderConfigProperty age = new ProviderConfigProperty();
-        this.initiatizeConfigProperty("enableAgeLowerOver18", "yivi age over 18 property", "It enables or disables using over 18 age in request", age);
-        configProperties.add(age);
-
-        ProviderConfigProperty city = new ProviderConfigProperty();
-        this.initiatizeConfigProperty("enableAddressCity", "yivi city property", "It enables or disables using city in request", city);
-        configProperties.add(city);
-
-        ProviderConfigProperty email = new ProviderConfigProperty();
-        this.initiatizeConfigProperty("enableEmailEmail", "yivi email property", "It enables or disables using email in request", email);
-        configProperties.add(email);
-
-        ProviderConfigProperty studentCardUniversity = new ProviderConfigProperty();
-        this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property", "It enables or disables using university in request", studentCardUniversity);
-        configProperties.add(studentCardUniversity);
-
         ProviderConfigProperty disableAttributeStorage = new ProviderConfigProperty();
         disableAttributeStorage.setName("disableAttributeStorage");
         disableAttributeStorage.setLabel("Disable Attribute Storage");
         disableAttributeStorage.setType(ProviderConfigProperty.BOOLEAN_TYPE);
         disableAttributeStorage.setDefaultValue("false");
         disableAttributeStorage.setHelpText("If true, attributes will not be stored after verification.");
-        
         configProperties.add(disableAttributeStorage);
 
-        //masked account config
+           //masked account config
         ProviderConfigProperty enableMasked = new ProviderConfigProperty();
         enableMasked.setName("enableMaskedAccount");
         enableMasked.setLabel("Enable Masked Account");
@@ -117,6 +96,33 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         keyProperty.setDefaultValue("keyvi-masked");
         keyProperty.setHelpText("Specify the key prefix for masked accounts. For example keyvi-masked");
         configProperties.add(keyProperty);
+
+        ProviderConfigProperty email = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableEmailEmail", "yivi email property", "It enables or disables using email in request", email);
+        configProperties.add(email);
+
+        ProviderConfigProperty age = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableAgeLowerOver18", "yivi age over 18 property", "It enables or disables using over 18 age in request", age);
+        configProperties.add(age);
+
+        ProviderConfigProperty country = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableCountry", "yivi country property", "It enables or disables using country in request", country);
+        configProperties.add(country);
+
+        ProviderConfigProperty city = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableAddressCity", "yivi city property", "It enables or disables using city in request", city);
+        configProperties.add(city);
+
+        ProviderConfigProperty studentCardUniversity = new ProviderConfigProperty();
+        this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property", "It enables or disables using university in request", studentCardUniversity);
+        configProperties.add(studentCardUniversity);
+
+        ProviderConfigProperty property = new ProviderConfigProperty();
+        property.setName("jsonConfig");
+        property.setLabel("Custom Yivi Attributes JSON");
+        property.setType(ProviderConfigProperty.MULTIVALUED_STRING_TYPE);
+        property.setHelpText("Enter JSON configuration here.");
+        configProperties.add(property);
 
         return configProperties;
     }
