@@ -12,11 +12,7 @@ public class YiviUtilities {
         Gson gson = new Gson();
         JsonObject claimsData = gson.fromJson(claims, JsonObject.class);
 
-        String email = null;
-        String country = null;
-        String city = null;
-        String university = null;
-        String ageOver18 = "no";
+        JsonObject result = new JsonObject();
 
         JsonArray disclosedArray = claimsData.getAsJsonArray("disclosed");
         for (JsonElement arrayElement : disclosedArray) {
@@ -24,27 +20,29 @@ public class YiviUtilities {
             for (JsonElement objElement : array) {
                 JsonObject obj = objElement.getAsJsonObject();
                 String id = obj.get("id").getAsString();
-                String rawValue = obj.get("rawvalue").getAsString();
-                if (Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier().equals(id)) {
-                    ageOver18 = rawValue;
-                } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier().equals(id)) {
-                    country = rawValue;
-                } else if (Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier().equals(id)) {
-                    city = rawValue;
-                } else if (Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier().equals(id)) {
-                    email = rawValue;
-                } else if (Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier().equals(id)) {
-                    university = rawValue;
+                JsonElement rawValueElement = obj.get("rawvalue");
+                String rawValue = rawValueElement.isJsonNull() ? null : rawValueElement.getAsString();
+
+                switch (id) {
+                    case Identifiers.IrmaDemoMijnOverheid.AGE_LOWER_OVER_18.getIdentifier():
+                        result.addProperty("ageOver18", rawValue);
+                        break;
+                    case Identifiers.IrmaDemoMijnOverheid.ADDRESS_COUNTRY.getIdentifier():
+                        result.addProperty("country", rawValue);
+                        break;
+                    case Identifiers.IrmaDemoMijnOverheid.ADDRESS_CITY.getIdentifier():
+                        result.addProperty("city", rawValue);
+                        break;
+                    case Identifiers.Pbdf.EMAIL_EMAIL.getIdentifier():
+                        result.addProperty("email", rawValue);
+                        break;
+                    case Identifiers.IrmaDemoRU.STUDENT_CARD_UNIVERSITY.getIdentifier():
+                        result.addProperty("university", rawValue);
+                        break;
                 }
             }
         }
 
-        JsonObject result = new JsonObject();
-        result.addProperty("email", email);
-        result.addProperty("country", country);
-        result.addProperty("city", city);
-        result.addProperty("university", university);
-        result.addProperty("ageOver18", ageOver18);
         return result;
     }
 }
