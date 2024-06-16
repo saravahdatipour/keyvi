@@ -4,7 +4,6 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
-import org.keycloak.models.UserModel;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
 public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
@@ -14,17 +13,12 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
-        UserModel user = context.getUser();
-        AuthenticationSessionModel authSession = context.getAuthenticationSession();
-        if (isSocialLogin(authSession)) {
-            // Add your custom required action
-            user.addRequiredAction(PROVIDER_ID);
-            LOG.warnf("Social login was part of the session");
-        }
+       //
     }
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
+        LOG.warnf("The logger works");
         if (isSocialLogin(context.getAuthenticationSession())) {
             Response challenge = context.form().createForm("required-action.ftl");
             context.challenge(challenge);
@@ -43,6 +37,7 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
 
     private boolean isSocialLogin(AuthenticationSessionModel authSession) {
         String identityProvider = authSession.getAuthNote("identity_provider");
+        LOG.warnf("Auth note result: %s", identityProvider);
         return identityProvider != null && !identityProvider.equals("keycloak");
     }
 }
