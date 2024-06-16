@@ -32,12 +32,14 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
         LOG.warnf("Identity stream is: %s", stream);
 
         // Collect the stream elements into a list
+        // if it is not social login the stream collect will return null .. (for instnace if kc login)
         List<FederatedIdentityModel> federatedIdentities = stream.collect(Collectors.toList());
 
+        //last attempted federated...
         // Log the federated identities
         for (FederatedIdentityModel federatedIdentity : federatedIdentities) {
             LOG.warnf("Federated Identity Provider: %s, User ID: %s, User Name: %s",
-                    federatedIdentity.getIdentityProvider(),
+                    federatedIdentity.getIdentityProvider(), //if it is social login this for instance will be google
                     federatedIdentity.getUserId(),
                     federatedIdentity.getUserName());
         }
