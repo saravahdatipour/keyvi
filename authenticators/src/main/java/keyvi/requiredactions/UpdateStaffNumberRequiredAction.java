@@ -53,7 +53,7 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
     public void close() {
     }
 
-    private boolean isSocialLogin(AuthenticationSessionModel authSession, ) {
+    private boolean isSocialLogin(AuthenticationSessionModel authSession) {
         String identityProvider = authSession.getAuthNote("identity_provider");
         LOG.warnf("Auth note result: %s", identityProvider);
         return identityProvider != null && !identityProvider.equals("keycloak");
