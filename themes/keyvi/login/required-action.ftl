@@ -7,8 +7,8 @@
                 <div class="panel-body">
                     <!-- Yivi Web Form Integration -->
                     <#if enableYivi>
-                        <p>One more step!</p>
-                        <button id="start-popup" type="button">Login With Yivi</button>
+                        <p>One more step</p>
+                        <img id="start-popup" src="https://i.imgur.com/n0lTZ1v.png" alt="Login With Yivi" width="131" height="77" style="cursor: pointer;">
                     <#else>
                         <p>Yivi is not enabled!</p>
                     </#if>
