@@ -34,6 +34,18 @@ public class YiviRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
+        String yiviResult = context.getHttpRequest().getDecodedFormParameters().getFirst("yivi_result");
+        // in prod you will need token validation to ensure the yivi server can verify the integrity of token within yiviResult
+        if (yiviResult != null) {
+            // Yivi authentication successful
+            LOG.warnf("Yivi authentication successful. Result: %s", yiviResult);
+            context.success();
+        } else {
+            // Yivi authentication not performed or unsuccessful
+            LOG.warnf("Yivi authentication not performed or unsuccessful.");
+            Response challenge = context.form().createForm("required-action.ftl");
+            context.challenge(challenge);
+        }
     }
 
     @Override
@@ -58,4 +70,12 @@ public class YiviRequiredAction implements RequiredActionProvider {
     LOG.warnf("User is null. Assuming non-social login.");
     return false;
 }
+
+// private boolean validateYiviToken(String token) {
+//     // communicate with the Yivi server to verify the token's authenticity
+//     // Return true if the token is valid, false otherwise
+//     // For now assume non empty token means valid.
+//     return !token.isEmpty();
+// }
+
 }

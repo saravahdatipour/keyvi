@@ -9,6 +9,9 @@
                     <#if enableYivi>
                         <h3 style="text-align: center;">One more step!</h3>
                         <img id="start-popup" src="https://i.imgur.com/n0lTZ1v.png" alt="Login With Yivi" width="131" height="77" style="cursor: pointer; border: 2px solid #2f2f2fa8; border-radius: 10px; padding: 10px; position: relative; left: 40%; margin-top: 1vh; ">
+                        <form id="yivi-form" action="${url.loginAction}" method="post" style="display: none;">
+                            <input type="hidden" id="yivi-result" name="yivi_result">
+                        </form>
                     <#else>
                         <p>Yivi is not enabled!</p>
                     </#if>
@@ -49,13 +52,14 @@
 
                                 startPopupButton.onclick = () => {
                                     yiviPopup.start()
-                                        .then(result => {
-                                            console.log("Authentication successful", result);
-                                        })
-                                        .catch(error => {
-                                            console.error("Error during authentication", error);
-                                        });
-                                };
+                                    .then(result => {
+                                        console.log("Authentication successful", result);
+                                        document.getElementById('yivi-result').value = JSON.stringify(result);
+                                        document.getElementById('yivi-form').submit();
+                                    })
+                                    .catch(error => {
+                                        console.error("Error during authentication", error);
+                                    });
                             }
                         });
                     </script>
