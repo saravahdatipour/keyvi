@@ -13,6 +13,7 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
 public class YiviUtilities {
+    private static final Logger LOG = Logger.getLogger(YiviUtilities.class);
 
     public static JsonObject parseDisclosedArray(String claims) {
         Gson gson = new Gson();
@@ -93,7 +94,7 @@ public class YiviUtilities {
         return false;
     } catch (Exception e) {
         // Handle any exceptions that occur during the HTTP request or JSON parsing
-        Logger.getLogger(YiviUtilities.class).error("Error validating Yivi response", e);
+        LOG.warnf("Error validating Yivi response exception was thrown.");
         return false;
     }
 }
