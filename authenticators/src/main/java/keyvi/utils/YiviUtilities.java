@@ -7,10 +7,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import keyvi.attributes.Identifiers;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 public class YiviUtilities {
 
@@ -63,35 +63,37 @@ public class YiviUtilities {
                 // Create the URL for the token status endpoint
                 String url = "https://catchthebugs.com/session/" + token + "/status";
 
-                // Create an instance of HttpClient
-                HttpClient httpClient = HttpClient.newHttpClient();
+                // Create a Jakarta EE client
+                Client client = ClientBuilder.newClient();
 
-                // Create a GET request to the token status endpoint
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .GET()
-                        .build();
+                try {
+                    // Create a WebTarget for the token status endpoint
+                    WebTarget target = client.target(url);
 
-                // Send the request and retrieve the response
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    // Send a GET request to the token status endpoint
+                    Response response = target.request().get();
 
-                // Check if the response status code is 200 (OK)
-                if (response.statusCode() == 200) {
-                    // Get the response body as a string
-                    String responseBody = response.body().trim();
+                    // Check if the response status code is 200 (OK)
+                    if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                        // Get the response body as a string
+                        String responseBody = response.readEntity(String.class).trim();
 
-                    // Check if the response body is exactly "DONE"
-                    if (responseBody.equals("DONE")) {
-                        // Token is valid
-                        return true;
+                        // Check if the response body is exactly "DONE"
+                        if (responseBody.equals("DONE")) {
+                            // Token is valid
+                            return true;
+                        }
                     }
+                } finally {
+                    // Close the client
+                    client.close();
                 }
             }
         }
         return false;
     } catch (Exception e) {
         // Handle any exceptions that occur during the HTTP request or JSON parsing
-        System.err.println("Error validating Yivi response: " + e.getMessage());
+        Logger.getLogger(YiviUtilities.class).error("Error validating Yivi response", e);
         return false;
     }
 }
