@@ -7,11 +7,11 @@ import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
-public class UpdateStaffNumberRequiredActionFactory implements RequiredActionFactory {
+public class YiviRequiredActionFactory implements RequiredActionFactory {
 
-    private static final Logger log = Logger.getLogger(UpdateStaffNumberRequiredActionFactory.class);
+    private static final Logger log = Logger.getLogger(YiviRequiredActionFactory.class);
 
-    private static final UpdateStaffNumberRequiredAction SINGLETON = new UpdateStaffNumberRequiredAction();
+    private static final YiviRequiredAction SINGLETON = new YiviRequiredAction();
 
     @Override
     public String getDisplayText() {
@@ -40,6 +40,6 @@ public class UpdateStaffNumberRequiredActionFactory implements RequiredActionFac
 
     @Override
     public String getId() {
-        return UpdateStaffNumberRequiredAction.PROVIDER_ID;
+        return YiviRequiredAction.PROVIDER_ID;
     }
 }

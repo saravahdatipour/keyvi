@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
-
-    public static final String PROVIDER_ID = "usn-required-action";
-    private static final Logger LOG = Logger.getLogger(UpdateStaffNumberRequiredAction.class);
+public class YiviRequiredAction implements RequiredActionProvider {
+    //Yivi as a required action if user chooses to sign up via social providers
+    public static final String PROVIDER_ID = "yivi-required-action";
+    private static final Logger LOG = Logger.getLogger(YiviRequiredAction.class);
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
