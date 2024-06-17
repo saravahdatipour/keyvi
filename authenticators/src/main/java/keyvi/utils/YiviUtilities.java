@@ -7,6 +7,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import keyvi.attributes.Identifiers;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 public class YiviUtilities {
 
     public static JsonObject parseDisclosedArray(String claims) {
@@ -49,13 +54,47 @@ public class YiviUtilities {
     }
 
     public static boolean isResponseValid(String claimsJson) {
+    try {
         JsonElement element = JsonParser.parseString(claimsJson);
         if (element.isJsonObject()) {
             JsonObject jsonObject = element.getAsJsonObject();
-            String status = getJsonString(jsonObject, "status");
-            String proofStatus = getJsonString(jsonObject, "proofStatus");
-            return "DONE".equals(status) && "VALID".equals(proofStatus);
+            String token = getJsonString(jsonObject, "token");
+            if (token != null) {
+                // Create the URL for the token status endpoint
+                String url = "https://catchthebugs.com/session/" + token + "/status";
+
+                // Create an instance of HttpClient
+                HttpClient httpClient = HttpClient.newHttpClient();
+
+                // Create a GET request to the token status endpoint
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(url))
+                        .GET()
+                        .build();
+
+                // Send the request and retrieve the response
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                // Check if the response status code is 200 (OK)
+                if (response.statusCode() == 200) {
+                    // Get the response body as a string
+                    String responseBody = response.body().trim();
+
+                    // Check if the response body is exactly "DONE"
+                    if (responseBody.equals("DONE")) {
+                        // Token is valid
+                        return true;
+                    }
+                }
+            }
         }
         return false;
+    } catch (Exception e) {
+        // Handle any exceptions that occur during the HTTP request or JSON parsing
+        System.err.println("Error validating Yivi response: " + e.getMessage());
+        return false;
     }
+}
+
+
 }

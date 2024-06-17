@@ -12,6 +12,8 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import keyvi.utils.YiviUtilities;
+
 
 public class YiviRequiredAction implements RequiredActionProvider {
     //Yivi as a required action if user chooses to sign up via social providers
@@ -70,12 +72,5 @@ public class YiviRequiredAction implements RequiredActionProvider {
     LOG.warnf("User is null. Assuming non-social login.");
     return false;
 }
-
-// private boolean validateYiviToken(String token) {
-//     // communicate with the Yivi server to verify the token's authenticity
-//     // Return true if the token is valid, false otherwise
-//     // For now assume non empty token means valid.
-//     return !token.isEmpty();
-// }
 
 }
