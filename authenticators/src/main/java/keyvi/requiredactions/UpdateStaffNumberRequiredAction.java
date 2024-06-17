@@ -20,39 +20,11 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
-       //
     }
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
-        LOG.warnf("The logger works");
-        UserModel user = context.getUser();
-
-        Stream<FederatedIdentityModel> stream =  context.getSession().users().getFederatedIdentitiesStream(context.getRealm(), user);
-        LOG.warnf("Identity stream is: %s", stream);
-
-        // Collect the stream elements into a list
-        // if it is not social login the stream collect will return null .. (for instnace if kc login)
-        List<FederatedIdentityModel> federatedIdentities = stream.collect(Collectors.toList());
-
-        //last attempted federated...
-        // Log the federated identities
-        for (FederatedIdentityModel federatedIdentity : federatedIdentities) {
-            LOG.warnf("Federated Identity Provider: %s, User ID: %s, User Name: %s",
-                    federatedIdentity.getIdentityProvider(), //if it is social login this for instance will be google
-                    federatedIdentity.getUserId(),
-                    federatedIdentity.getUserName());
-        }
-
-        String serviceAccountLink = user.getServiceAccountClientLink();
-        String identityProvider = user.getFederationLink();
-        LOG.warnf("federation link is: %s", identityProvider);
-        LOG.warnf("service account link is: %s", serviceAccountLink);
-
-        String ssoAuth = AuthenticationManager.SSO_AUTH;
-        LOG.warnf("SSO AUTH is %s", ssoAuth);
-
-        if (isSocialLogin(context.getAuthenticationSession())) {
+        if (this.isSocialLogin(context)) {
             Response challenge = context.form().createForm("required-action.ftl");
             context.challenge(challenge);
         } else {
@@ -68,9 +40,22 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
     public void close() {
     }
 
-    private boolean isSocialLogin(AuthenticationSessionModel authSession) {
-        String identityProvider = authSession.getAuthNote("identity_provider");
-        LOG.warnf("Auth note result: %s", identityProvider);
-        return identityProvider != null && !identityProvider.equals("keycloak");
+    private boolean isSocialLogin(AuthenticationFlowContext context) {
+    UserModel user = context.getUser();
+    if (user != null) {
+        Stream<FederatedIdentityModel> stream = context.getSession().users().getFederatedIdentitiesStream(context.getRealm(), user);
+        LOG.warnf("Identity stream is: %s", stream);
+
+        List<FederatedIdentityModel> federatedIdentities = stream.collect(Collectors.toList());
+        if (federatedIdentities.isEmpty()) {
+            LOG.warnf("No federated identities found. Assuming non-social login.");
+            return false;
+        } else {
+            LOG.warnf("Federated identities found. Assuming social login.");
+            return true;
+        }
     }
+    LOG.warnf("User is null. Assuming non-social login.");
+    return false;
+}
 }

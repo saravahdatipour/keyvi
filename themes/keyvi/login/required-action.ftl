@@ -7,6 +7,7 @@
                 <div class="panel-body">
                     <!-- Yivi Web Form Integration -->
                     <#if enableYivi>
+                        <p>One more step!</p>
                         <button id="start-popup" type="button">Login With Yivi</button>
                     <#else>
                         <p>Yivi is not enabled!</p>
