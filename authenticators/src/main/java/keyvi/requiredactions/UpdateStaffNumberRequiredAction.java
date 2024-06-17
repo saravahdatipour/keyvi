@@ -40,7 +40,7 @@ public class UpdateStaffNumberRequiredAction implements RequiredActionProvider {
     public void close() {
     }
 
-    private boolean isSocialLogin(AuthenticationFlowContext context) {
+    private boolean isSocialLogin(RequiredActionContext context) {
     UserModel user = context.getUser();
     if (user != null) {
         Stream<FederatedIdentityModel> stream = context.getSession().users().getFederatedIdentitiesStream(context.getRealm(), user);
