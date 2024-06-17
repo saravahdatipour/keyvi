@@ -7,8 +7,8 @@
                 <div class="panel-body">
                     <!-- Yivi Web Form Integration -->
                     <#if enableYivi>
-                        <p>One more step</p>
-                        <img id="start-popup" src="https://i.imgur.com/n0lTZ1v.png" alt="Login With Yivi" width="131" height="77" style="cursor: pointer;">
+                        <h3>One more step!</h3>
+                        <img id="start-popup" src="https://i.imgur.com/n0lTZ1v.png" alt="Login With Yivi" width="131" height="77" style="cursor: pointer; border: 2px solid #2f2f2fa8; border-radius: 10px; padding: 10px; position: relative; left: 40%; margin-top: 1vh; ">
                     <#else>
                         <p>Yivi is not enabled!</p>
                     </#if>
