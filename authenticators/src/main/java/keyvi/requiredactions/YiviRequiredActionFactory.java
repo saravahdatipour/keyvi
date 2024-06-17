@@ -15,7 +15,7 @@ public class YiviRequiredActionFactory implements RequiredActionFactory {
 
     @Override
     public String getDisplayText() {
-        return "Update Staff Number";
+        return "Verify with Yivi If Social Login";
     }
 
     @Override
