@@ -118,29 +118,29 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
 
         //All Provider Config Properties below are disabled in admin:
         ProviderConfigProperty city = new ProviderConfigProperty();
-        this.initiatizeConfigProperty("enableAddressCity", "yivi city property", "It enables or disables using city in request", city);
-        city.setSecret(true);
+        this.initiatizeConfigProperty("enableAddressCity", "yivi city property (archived)", "It enables or disables using city in request", city);
+        city.setReadOnly(true);
         configProperties.add(city);
 
         ProviderConfigProperty studentCardUniversity = new ProviderConfigProperty();
-        this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property", "It enables or disables using university in request", studentCardUniversity);
-        studentCardUniversity.setSecret(true);
+        this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property (archived)", "It enables or disables using university in request", studentCardUniversity);
+        studentCardUniversity.setReadOnly(true);
         configProperties.add(studentCardUniversity);
 
         ProviderConfigProperty useCustomConfig = new ProviderConfigProperty();
         useCustomConfig.setName("onlyUseCustomConfig");
-        useCustomConfig.setLabel("Only Use Custom Disclosure Config");
+        useCustomConfig.setLabel("Only Use Custom Disclosure Config (archived)");
         useCustomConfig.setType(ProviderConfigProperty.BOOLEAN_TYPE);
         useCustomConfig.setDefaultValue("false");
-        useCustomConfig.setSecret(true);
+        useCustomConfig.setReadOnly(true);
         useCustomConfig.setHelpText("Enable to use custom disclosure JSON instead of default settings.");
         configProperties.add(useCustomConfig);
 
         ProviderConfigProperty jsonProperty = new ProviderConfigProperty();
         jsonProperty.setName("disclosureConfigYivi");
-        jsonProperty.setLabel("Custom Config Disclosure Array");
+        jsonProperty.setLabel("Custom Config Disclosure Array (archived)");
         jsonProperty.setType(ProviderConfigProperty.STRING_TYPE);
-        jsonProperty.setSecret(true);
+        jsonProperty.setReadOnly(true);
         jsonProperty.setHelpText("Enter Disclosure part of json string.");
         configProperties.add(jsonProperty);
 
