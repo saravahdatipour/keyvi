@@ -1,8 +1,14 @@
 package keyvi.authenticators;
 
+import com.google.gson.JsonObject;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
-import keyvi.attributes.Identifiers;
+import keyvi.attributes.AttributeManager;
+import keyvi.objects.UserResult;
+import keyvi.utils.AccountMasker;
+import keyvi.utils.FeatureManager;
+import keyvi.utils.PasswordGenerator;
+import keyvi.utils.YiviUtilities;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -12,23 +18,13 @@ import org.keycloak.events.Errors;
 import org.keycloak.models.*;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
+
 import java.util.Map;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import keyvi.objects.UserResult; 
-import keyvi.utils.PasswordGenerator;
-import keyvi.utils.AccountMasker;
-import keyvi.attributes.AttributeManager;
-import keyvi.utils.FeatureManager;
-import keyvi.utils.YiviUtilities;
+import java.util.Objects;
 
 
 public class DisclosureAuthenticator implements Authenticator  {
     private static final Logger LOG = Logger.getLogger(DisclosureAuthenticator.class);
-    public static final String USERNAME_PASSWORD_LOGIN_FORM = "backup.ftl";
-    public static boolean YIVI_TOGGLE = true;
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
@@ -176,10 +172,18 @@ private UserResult initializeYiviAccount(AuthenticationFlowContext context, Stri
     LOG.warnf("All config values: %s", config);
 
     boolean enableAgeLowerOver18 = FeatureManager.isFeatureEnabled("enableAgeLowerOver18", context);
+    boolean isCountryEnabled = FeatureManager.isFeatureEnabled("enableCountry", context);
 
      if (enableAgeLowerOver18 && !ageOver18.equals("yes")) {
         return new UserResult(null, "Age verification failed or is missing. Must be over 18.");
     }
+
+    String countryAcceptedValue = FeatureManager.getFeatureValue("countryAcceptedValue", context);
+     if (isCountryEnabled && !Objects.equals(country, countryAcceptedValue))
+     {
+         String errorMessage = String.format("Your country needs to be: %s", countryAcceptedValue);
+         return new UserResult(null, errorMessage);
+     }
 
      if (email == null) {
         return new UserResult(null, "Email is missing in the claims data.");

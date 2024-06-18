@@ -1,5 +1,6 @@
 package keyvi.requiredactions;
 
+import com.google.gson.JsonObject;
 import jakarta.ws.rs.core.Response;
 import keyvi.utils.YiviUtilities;
 import org.jboss.logging.Logger;
@@ -35,7 +36,10 @@ public class YiviRequiredAction implements RequiredActionProvider {
     @Override
     public void processAction(RequiredActionContext context) {
         String yiviResult = context.getHttpRequest().getDecodedFormParameters().getFirst("yivi_result");
-        if (yiviResult != null && YiviUtilities.isResponseValid(yiviResult)) {
+
+        boolean isOver18 = this.validateAgeOver18(yiviResult);
+
+        if (yiviResult != null && YiviUtilities.isResponseValid(yiviResult) && isOver18) {
             // Yivi authentication successful
             LOG.warnf("Yivi authentication successful. Result: %s", yiviResult);
             context.success();
@@ -47,27 +51,41 @@ public class YiviRequiredAction implements RequiredActionProvider {
         }
     }
 
+
     @Override
     public void close() {
     }
 
     private boolean isSocialLogin(RequiredActionContext context) {
-    UserModel user = context.getUser();
-    if (user != null) {
-        Stream<FederatedIdentityModel> stream = context.getSession().users().getFederatedIdentitiesStream(context.getRealm(), user);
-        LOG.warnf("Identity stream is: %s", stream);
+        UserModel user = context.getUser();
+        if (user != null) {
+            Stream<FederatedIdentityModel> stream = context.getSession().users().getFederatedIdentitiesStream(context.getRealm(), user);
+            LOG.warnf("Identity stream is: %s", stream);
 
-        List<FederatedIdentityModel> federatedIdentities = stream.collect(Collectors.toList());
-        if (federatedIdentities.isEmpty()) {
-            LOG.warnf("No federated identities found. Assuming non-social login.");
-            return false;
-        } else {
-            LOG.warnf("Federated identities found. Assuming social login.");
-            return true;
+            List<FederatedIdentityModel> federatedIdentities = stream.collect(Collectors.toList());
+            if (federatedIdentities.isEmpty()) {
+                LOG.warnf("No federated identities found. Assuming non-social login.");
+                return false;
+            } else {
+                LOG.warnf("Federated identities found. Assuming social login.");
+                return true;
+            }
         }
+        LOG.warnf("User is null. Assuming non-social login.");
+        return false;
     }
-    LOG.warnf("User is null. Assuming non-social login.");
-    return false;
-}
+
+    private boolean validateAgeOver18(String yiviResult) {
+        if(yiviResult == null)
+        {
+            return false;
+        }
+
+        JsonObject parsedAttributes = YiviUtilities.parseDisclosedArray(yiviResult);
+        String ageOver18 = YiviUtilities.getJsonString(parsedAttributes, "ageOver18");
+
+        return ageOver18.equals("yes");
+    }
+
 
 }

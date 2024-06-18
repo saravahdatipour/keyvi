@@ -3,14 +3,12 @@ package keyvi.authenticators;
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
-import org.keycloak.broker.social.SocialIdentityProvider;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
@@ -110,27 +108,39 @@ public class DisclosureAuthenticatorFactory implements AuthenticatorFactory {
         this.initiatizeConfigProperty("enableCountry", "yivi country property", "It enables or disables using country in request", country);
         configProperties.add(country);
 
+        ProviderConfigProperty acceptedCountry = new ProviderConfigProperty();
+        acceptedCountry.setName("countryAcceptedValue");
+        acceptedCountry.setLabel("Country string should match:");
+        acceptedCountry.setType(ProviderConfigProperty.STRING_TYPE);
+        acceptedCountry.setDefaultValue("Netherlands");
+        configProperties.add(acceptedCountry);
+
+
+        //All Provider Config Properties below are disabled in admin:
         ProviderConfigProperty city = new ProviderConfigProperty();
         this.initiatizeConfigProperty("enableAddressCity", "yivi city property", "It enables or disables using city in request", city);
+        city.setSecret(true);
         configProperties.add(city);
 
         ProviderConfigProperty studentCardUniversity = new ProviderConfigProperty();
         this.initiatizeConfigProperty("enableStudentCardUniversity", "yivi univeristy property", "It enables or disables using university in request", studentCardUniversity);
+        studentCardUniversity.setSecret(true);
         configProperties.add(studentCardUniversity);
-
 
         ProviderConfigProperty useCustomConfig = new ProviderConfigProperty();
         useCustomConfig.setName("onlyUseCustomConfig");
         useCustomConfig.setLabel("Only Use Custom Disclosure Config");
         useCustomConfig.setType(ProviderConfigProperty.BOOLEAN_TYPE);
         useCustomConfig.setDefaultValue("false");
+        useCustomConfig.setSecret(true);
         useCustomConfig.setHelpText("Enable to use custom disclosure JSON instead of default settings.");
         configProperties.add(useCustomConfig);
 
         ProviderConfigProperty jsonProperty = new ProviderConfigProperty();
         jsonProperty.setName("disclosureConfigYivi");
         jsonProperty.setLabel("Custom Config Disclosure Array");
-        jsonProperty.setType(ProviderConfigProperty.STRING_TYPE); 
+        jsonProperty.setType(ProviderConfigProperty.STRING_TYPE);
+        jsonProperty.setSecret(true);
         jsonProperty.setHelpText("Enter Disclosure part of json string.");
         configProperties.add(jsonProperty);
 
