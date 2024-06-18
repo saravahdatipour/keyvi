@@ -1,17 +1,15 @@
 package keyvi.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import keyvi.attributes.Identifiers;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.jboss.logging.Logger;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Response;
 
 public class YiviUtilities {
     private static final Logger LOG = Logger.getLogger(YiviUtilities.class);
@@ -56,49 +54,59 @@ public class YiviUtilities {
     }
 
     public static boolean isResponseValid(String claimsJson) {
-    try {
-        JsonElement element = JsonParser.parseString(claimsJson);
-        if (element.isJsonObject()) {
-            JsonObject jsonObject = element.getAsJsonObject();
-            String token = getJsonString(jsonObject, "token");
-            if (token != null) {
-                // Create the URL for the token status endpoint
-                String url = "https://catchthebugs.com/session/" + token + "/status";
+        try {
+            JsonElement element = JsonParser.parseString(claimsJson);
+            if (element.isJsonObject()) {
+                JsonObject jsonObject = element.getAsJsonObject();
+                String token = getJsonString(jsonObject, "token");
+                if (token != null) {
+                    // Create the URL for the token status endpoint
+                    String url = "https://catchthebugs.com/session/" + token + "/status";
+                    LOG.infof("Validating token: %s", token);
 
-                // Create a Jakarta EE client
-                Client client = ClientBuilder.newClient();
+                    // Create an Apache HttpClient
+                    try (CloseableHttpClient client = HttpClients.createDefault()) {
+                        // Create a GET request
+                        HttpGet request = new HttpGet(url);
+                        LOG.warnf("Sending GET request to: %s", url);
 
-                try {
-                    // Create a WebTarget for the token status endpoint
-                    WebTarget target = client.target(url);
+                        // Send the GET request and retrieve the response
+                        HttpResponse response = client.execute(request);
+                        int statusCode = response.getStatusLine().getStatusCode();
+                        LOG.warnf("Response status code: %d", statusCode);
 
-                    // Send a GET request to the token status endpoint
-                    Response response = target.request().get();
+                        // Check if the response status code is 200 (OK)
+                        if (statusCode == 200) {
+                            // Get the response body as a string
+                            HttpEntity entity = response.getEntity();
+                            String responseBody = EntityUtils.toString(entity).trim();
+                            LOG.warnf("Response body: %s", responseBody);
 
-                    // Check if the response status code is 200 (OK)
-                    if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                        // Get the response body as a string
-                        String responseBody = response.readEntity(String.class).trim();
-
-                        // Check if the response body is exactly "DONE"
-                        if (responseBody.equals("DONE")) {
-                            // Token is valid
-                            return true;
+                            // Check if the response body is exactly "DONE"
+                            if (responseBody.equals("DONE")) {
+                                LOG.info("Token is valid");
+                                return true;
+                            } else {
+                                LOG.warn("Invalid response body");
+                            }
+                        } else {
+                            LOG.warnf("Unexpected status code: %d", statusCode);
                         }
                     }
-                } finally {
-                    // Close the client
-                    client.close();
+                } else {
+                    LOG.warnf("Token not found in JSON");
                 }
+            } else {
+                LOG.warnf("Invalid JSON format");
             }
+            return false;
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the HTTP request or JSON parsing
+            LOG.warnf("Error validating Yivi response: %s", e.getMessage());
+            LOG.warnf("Exception details:", e);
+            return false;
         }
-        return false;
-    } catch (Exception e) {
-        // Handle any exceptions that occur during the HTTP request or JSON parsing
-        LOG.warnf("Error validating Yivi response exception was thrown: %s", e);
-        return false;
     }
-}
 
 
 }
