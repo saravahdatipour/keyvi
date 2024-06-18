@@ -1,18 +1,16 @@
 package keyvi.requiredactions;
 
 import jakarta.ws.rs.core.Response;
+import keyvi.utils.YiviUtilities;
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.models.FederatedIdentityModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.services.managers.AuthenticationManager;
-import org.keycloak.sessions.AuthenticationSessionModel;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import keyvi.utils.YiviUtilities;
 
 
 public class YiviRequiredAction implements RequiredActionProvider {
@@ -38,7 +36,7 @@ public class YiviRequiredAction implements RequiredActionProvider {
     public void processAction(RequiredActionContext context) {
         String yiviResult = context.getHttpRequest().getDecodedFormParameters().getFirst("yivi_result");
         // in prod you will need token validation to ensure the yivi server can verify the integrity of token within yiviResult
-        if (yiviResult != null) {
+        if (yiviResult != null && YiviUtilities.isResponseValid(yiviResult)) {
             // Yivi authentication successful
             LOG.warnf("Yivi authentication successful. Result: %s", yiviResult);
             context.success();
