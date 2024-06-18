@@ -82,12 +82,15 @@ public class YiviUtilities {
                             String responseBody = EntityUtils.toString(entity).trim();
                             LOG.warnf("Response body: %s", responseBody);
 
-                            // Check if the response body is exactly "DONE"
-                            if (responseBody.equals("DONE")) {
-                                LOG.info("Token is valid");
+                            // Remove the double quotes from the response body
+                            String trimmedResponseBody = responseBody.replaceAll("^\"|\"$", "");
+
+                            // Check if the trimmed response body is exactly "DONE"
+                            if (trimmedResponseBody.equals("DONE")) {
+                                LOG.warnf("Token is valid");
                                 return true;
                             } else {
-                                LOG.warn("Invalid response body");
+                                LOG.warnf("Invalid response body");
                             }
                         } else {
                             LOG.warnf("Unexpected status code: %d", statusCode);
