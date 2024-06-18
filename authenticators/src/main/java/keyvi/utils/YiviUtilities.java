@@ -95,7 +95,7 @@ public class YiviUtilities {
         return false;
     } catch (Exception e) {
         // Handle any exceptions that occur during the HTTP request or JSON parsing
-        LOG.warnf("Error validating Yivi response exception was thrown.");
+        LOG.warnf("Error validating Yivi response exception was thrown: %s", e);
         return false;
     }
 }
