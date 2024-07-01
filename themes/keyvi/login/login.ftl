@@ -68,7 +68,7 @@
                                         </#if>
                                          <!-- Yivi Web Form Integration -->
                                      <#if enableYivi?exists && enableYivi>
-                                         <button id="start-popup" type="button">Login With Yivi</button>
+                                         <button id="start-popup" class="btn btn-warning" type="button">Login With Yivi</button>
                                     <#else>
                                         <p>Yivi is not enabled!</p>
                                     </#if>
