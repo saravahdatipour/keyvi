@@ -1,358 +1,178 @@
 {
-  "realms": [
+  "id": "example",
+  "realm": "example",
+  "enabled": true,
+  "loginTheme": "keyvi",
+  "browserFlow": "custom-browser",
+  "authenticationFlows": [
     {
-      "id": "example",
-      "realm": "example",
-      "enabled": true,
-      "loginTheme": "keyvi",
-      "browserFlow": "custom-browser",
-      "authenticationFlows": [
+      "alias": "custom-browser",
+      "description": "Custom Browser flow",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
         {
-          "alias": "custom-browser",
-          "description": "Custom Browser flow",
-          "providerId": "basic-flow",
-          "topLevel": true,
-          "builtIn": false,
-          "authenticationExecutions": [
-            {
-              "authenticator": "auth-cookie",
-              "requirement": "ALTERNATIVE",
-              "priority": 0,
-              "userSetupAllowed": false
-            },
-            {
-              "authenticator": "identity-provider-redirector",
-              "requirement": "ALTERNATIVE",
-              "priority": 1,
-              "userSetupAllowed": false
-            },
-            {
-              "authenticator": "disclosure-authenticator",
-              "requirement": "REQUIRED",
-              "priority": 2,
-              "userSetupAllowed": false,
-              "authenticatorConfig": "disclosure-auth-config"
-            }
-          ]
-        }
-      ],
-      "authenticatorConfig": [
-        {
-          "alias": "disclosure-auth-config",
-          "config": {
-            "enableYivi": "true"
-          }
-        }
-      ],
-      "clients": [
-        {
-          "clientId": "myclient",
-          "name": "",
-          "description": "",
-          "rootUrl": "",
-          "adminUrl": "",
-          "baseUrl": "https://www.keycloak.org/app/#url=https://yivisso:8443&realm=example&client=myclient",
-          "surrogateAuthRequired": false,
-          "enabled": true,
-          "alwaysDisplayInConsole": false,
-          "clientAuthenticatorType": "client-secret",
-          "redirectUris": [
-            "https://www.keycloak.org/app/*"
-          ],
-          "webOrigins": [
-            "https://www.keycloak.org"
-          ],
-          "notBefore": 0,
-          "bearerOnly": false,
-          "consentRequired": false,
-          "standardFlowEnabled": true,
-          "implicitFlowEnabled": false,
-          "directAccessGrantsEnabled": true,
-          "serviceAccountsEnabled": false,
-          "publicClient": true,
-          "frontchannelLogout": true,
-          "protocol": "openid-connect",
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
-            "display.on.consent.screen": "false",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.session.required": "true",
-            "backchannel.logout.revoke.offline.tokens": "false",
-            "post.logout.redirect.uris": "https://www.keycloak.org/app/*"
-          },
-          "authenticationFlowBindingOverrides": {},
-          "fullScopeAllowed": true,
-          "nodeReRegistrationTimeout": -1,
-          "defaultClientScopes": [
-            "web-origins",
-            "acr",
-            "roles",
-            "profile",
-            "email"
-          ],
-          "optionalClientScopes": [
-            "address",
-            "phone",
-            "offline_access",
-            "microprofile-jwt"
-          ]
+          "authenticator": "auth-cookie",
+          "requirement": "ALTERNATIVE",
+          "priority": 0,
+          "userSetupAllowed": false
         },
         {
-          "clientId": "wordpress-client",
-          "name": "WordPress Client",
-          "description": "Client for WordPress integration",
-          "enabled": true,
-          "clientAuthenticatorType": "client-secret",
-          "redirectUris": [
-            "https://sample-domain.xyz/blog"
-          ],
-          "webOrigins": [
-            "https://sample-domain.xyz"
-          ],
-          "publicClient": false,
-          "serviceAccountsEnabled": true,
-          "standardFlowEnabled": true,
-          "directAccessGrantsEnabled": true,
-          "implicitFlowEnabled": false, 
-          "bearerOnly": false,
-          "consentRequired": false,
-          "protocol": "openid-connect",
-          "defaultClientScopes": [
-            "web-origins",
-            "profile",
-            "email",
-            "roles",
-            "phone"
-          ],
-          "optionalClientScopes": [
-            "offline_access",
-            "address",
-            "microprofile-jwt"
-          ],
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.session.required": "true",
-            "backchannel.logout.revoke.offline.tokens": "false"
-          }
+          "authenticator": "identity-provider-redirector",
+          "requirement": "ALTERNATIVE",
+          "priority": 1,
+          "userSetupAllowed": false
         },
         {
-          "clientId": "mastodon-client",
-          "name": "Mastodon Client",
-          "description": "Client for Mastodon integration",
-          "enabled": true,
-          "clientAuthenticatorType": "client-secret",
-          "redirectUris": [
-            "https://edukite.net/auth/auth/openid_connect/callback"
-          ],
-          "webOrigins": [
-            "https://edukite.net/"
-          ],
-          "publicClient": false,
-          "serviceAccountsEnabled": true,
-          "standardFlowEnabled": true,
-          "directAccessGrantsEnabled": true,
-          "implicitFlowEnabled": false, 
-          "bearerOnly": false,
-          "consentRequired": false,
-          "protocol": "openid-connect",
-          "defaultClientScopes": [
-            "web-origins",
-            "profile",
-            "email",
-            "roles",
-            "phone"
-          ],
-          "optionalClientScopes": [
-            "offline_access",
-            "address",
-            "microprofile-jwt"
-          ],
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.session.required": "true",
-            "backchannel.logout.revoke.offline.tokens": "false"
-          }
-        }
-      ]
-    },
-    {
-      "id": "wordpressrealm",
-      "realm": "wordpressrealm",
-      "enabled": true,
-      "loginTheme": "keyvi",
-      "browserFlow": "custom-browser",
-      "authenticationFlows": [
-        {
-          "alias": "custom-browser",
-          "description": "Custom Browser flow",
-          "providerId": "basic-flow",
-          "topLevel": true,
-          "builtIn": false,
-          "authenticationExecutions": [
-            {
-              "authenticator": "auth-cookie",
-              "requirement": "ALTERNATIVE",
-              "priority": 0,
-              "userSetupAllowed": false
-            },
-            {
-              "authenticator": "identity-provider-redirector",
-              "requirement": "ALTERNATIVE",
-              "priority": 1,
-              "userSetupAllowed": false
-            },
-            {
-              "authenticator": "disclosure-authenticator",
-              "requirement": "REQUIRED",
-              "priority": 2,
-              "userSetupAllowed": false,
-              "authenticatorConfig": "disclosure-auth-config"
-            }
-          ]
-        }
-      ],
-      "authenticatorConfig": [
-        {
-          "alias": "disclosure-auth-config",
-          "config": {
-            "enableYivi": "true"
-          }
-        }
-      ],
-      "clients": [
-        {
-          "clientId": "myclient",
-          "name": "",
-          "description": "",
-          "rootUrl": "",
-          "adminUrl": "",
-          "baseUrl": "https://www.keycloak.org/app/#url=https://yivisso:8443&realm=wordpressrealm&client=myclient",
-          "surrogateAuthRequired": false,
-          "enabled": true,
-          "alwaysDisplayInConsole": false,
-          "clientAuthenticatorType": "client-secret",
-          "redirectUris": [
-            "https://www.keycloak.org/app/*"
-          ],
-          "webOrigins": [
-            "https://www.keycloak.org"
-          ],
-          "notBefore": 0,
-          "bearerOnly": false,
-          "consentRequired": false,
-          "standardFlowEnabled": true,
-          "implicitFlowEnabled": false,
-          "directAccessGrantsEnabled": true,
-          "serviceAccountsEnabled": false,
-          "publicClient": true,
-          "frontchannelLogout": true,
-          "protocol": "openid-connect",
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
-            "display.on.consent.screen": "false",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.session.required": "true",
-            "backchannel.logout.revoke.offline.tokens": "false",
-            "post.logout.redirect.uris": "https://www.keycloak.org/app/*"
-          },
-          "authenticationFlowBindingOverrides": {},
-          "fullScopeAllowed": true,
-          "nodeReRegistrationTimeout": -1,
-          "defaultClientScopes": [
-            "web-origins",
-            "acr",
-            "roles",
-            "profile",
-            "email"
-          ],
-          "optionalClientScopes": [
-            "address",
-            "phone",
-            "offline_access",
-            "microprofile-jwt"
-          ]
-        },
-        {
-          "clientId": "wordpress-client",
-          "name": "WordPress Client",
-          "description": "Client for WordPress integration",
-          "enabled": true,
-          "clientAuthenticatorType": "client-secret",
-          "redirectUris": [
-            "https://sample-domain.xyz/blog"
-          ],
-          "webOrigins": [
-            "https://sample-domain.xyz"
-          ],
-          "publicClient": false,
-          "serviceAccountsEnabled": true,
-          "standardFlowEnabled": true,
-          "directAccessGrantsEnabled": true,
-          "implicitFlowEnabled": false, 
-          "bearerOnly": false,
-          "consentRequired": false,
-          "protocol": "openid-connect",
-          "defaultClientScopes": [
-            "web-origins",
-            "profile",
-            "email",
-            "roles",
-            "phone"
-          ],
-          "optionalClientScopes": [
-            "offline_access",
-            "address",
-            "microprofile-jwt"
-          ],
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.session.required": "true",
-            "backchannel.logout.revoke.offline.tokens": "false"
-          }
-        },
-        {
-          "clientId": "mastodon-client",
-          "name": "Mastodon Client",
-          "description": "Client for Mastodon integration",
-          "enabled": true,
-          "clientAuthenticatorType": "client-secret",
-          "redirectUris": [
-            "https://edukite.net/auth/auth/openid_connect/callback"
-          ],
-          "webOrigins": [
-            "https://edukite.net/"
-          ],
-          "publicClient": false,
-          "serviceAccountsEnabled": true,
-          "standardFlowEnabled": true,
-          "directAccessGrantsEnabled": true,
-          "implicitFlowEnabled": false, 
-          "bearerOnly": false,
-          "consentRequired": false,
-          "protocol": "openid-connect",
-          "defaultClientScopes": [
-            "web-origins",
-            "profile",
-            "email",
-            "roles",
-            "phone"
-          ],
-          "optionalClientScopes": [
-            "offline_access",
-            "address",
-            "microprofile-jwt"
-          ],
-          "attributes": {
-            "oidc.ciba.grant.enabled": "false",
-            "oauth2.device.authorization.grant.enabled": "false",
-            "backchannel.logout.session.required": "true",
-            "backchannel.logout.revoke.offline.tokens": "false"
-          }
+          "authenticator": "disclosure-authenticator",
+          "requirement": "REQUIRED",
+          "priority": 2,
+          "userSetupAllowed": false,
+          "authenticatorConfig": "disclosure-auth-config"
         }
       ]
     }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "disclosure-auth-config",
+      "config": {
+        "enableYivi": "true"
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "myclient",
+      "name": "",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "https://www.keycloak.org/app/#url=https://yivisso:8443&realm=example&client=myclient",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "https://www.keycloak.org/app/*"
+      ],
+      "webOrigins": [
+        "https://www.keycloak.org"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "display.on.consent.screen": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "post.logout.redirect.uris": "https://www.keycloak.org/app/*"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "clientId": "wordpress-client",
+      "name": "WordPress Client",
+      "description": "Client for WordPress integration",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "https://sample-domain.xyz/blog"
+      ],
+      "webOrigins": [
+        "https://sample-domain.xyz"
+      ],
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false, 
+      "bearerOnly": false,
+      "consentRequired": false,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "email",
+        "roles",
+        "phone"
+      ],
+      "optionalClientScopes": [
+        "offline_access",
+        "address",
+        "microprofile-jwt"
+      ],
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      }
+    }
+    ,
+    {
+      "clientId": "mastodon-client",
+      "name": "Mastodon Client",
+      "description": "Client for Mastodon integration",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "https://edukite.net/auth/auth/openid_connect/callback"
+      ],
+      "webOrigins": [
+        "https://edukite.net/"
+      ],
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "implicitFlowEnabled": false, 
+      "bearerOnly": false,
+      "consentRequired": false,
+      "protocol": "openid-connect",
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "email",
+        "roles",
+        "phone"
+      ],
+      "optionalClientScopes": [
+        "offline_access",
+        "address",
+        "microprofile-jwt"
+      ],
+      "attributes": {
+        "oidc.ciba.grant.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      }
+    }    
   ]
 }
