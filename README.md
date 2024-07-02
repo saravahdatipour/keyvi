@@ -1,3 +1,4 @@
+![keyvi logo](keyvi-logo.png)
 Keyvi is a custom Keycloak login authenticator that integrates Yivi for handling custom credentials. This project allows you to extend Keycloak's authentication capabilities by incorporating Yivi for more secure and customizable login methods.
 
 ## Pre-requisites
@@ -25,3 +26,8 @@ themes/keyvi/login/login.ftl to include your domain for Yivi.
 docker compose build
 docker compose up
 ```
+
+### Notes:
+DO NOT USE for production! This prototype is in demonstration phase and uses the plain flow between Yivi client in theme folder and Yivi server (which should be set up with docker seperately). 
+The local-main branch starts up Keycloak in localhost to test changes,for this Yivi should also be in localhost.
+
