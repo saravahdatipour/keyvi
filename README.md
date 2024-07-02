@@ -1,4 +1,3 @@
-![keyvi logo](keyvi-logo.png)
 Keyvi is a custom Keycloak login authenticator that integrates Yivi for handling custom credentials. This project allows you to extend Keycloak's authentication capabilities by incorporating Yivi for more secure and customizable login methods.
 
 ## Pre-requisites
